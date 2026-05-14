@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+model School {
+  id          String   @id @default(uuid()) @db.VarChar(100)
+  name        String   @db.VarChar(191)
+  subdomain   String   @unique @db.VarChar(100)
+  logo        String?  @db.VarChar(191)
+  address     String?  @db.VarChar(191)
+  phone       String?  @db.VarChar(191)
+  email       String?  @db.VarChar(191)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  classes     Class[]
+  subjects    Subject[]
+}
+
+model User {
+  id            String   @id @default(uuid()) @db.VarChar(100)
+  email         String   @unique @db.VarChar(100)
+  password      String   @db.VarChar(191)
+  firstName     String   @db.VarChar(191)
+  lastName      String   @db.VarChar(191)
+  role          Role
+  schoolId      String   @db.VarChar(100)
+  school        School   @relation(fields: [schoolId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  teacher       Teacher?
+  student       Student?
+  parent        Parent?
+
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+}
+
+model Teacher {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  userId    String   @unique @db.VarChar(100)
+  user      User     @relation(fields: [userId], references: [id])
+  subjects  Subject[]
+  classes   Class[]
+  timetables Timetable[]
+  resources  Resource[]
+}
+
+model Student {
+  id          String   @id @default(uuid()) @db.VarChar(100)
+  userId      String   @unique @db.VarChar(100)
+  user      User     @relation(fields: [userId], references: [id])
+  classId     String   @db.VarChar(100)
+  class       Class    @relation(fields: [classId], references: [id])
+  parentId    String?  @db.VarChar(100)
+  parent      Parent?  @relation(fields: [parentId], references: [id])
+  grades      Grade[]
+  attendances Attendance[]
+}
+
+model Parent {
+  id        String    @id @default(uuid()) @db.VarChar(100)
+  userId    String    @unique @db.VarChar(100)
+  user      User      @relation(fields: [userId], references: [id])
+  students  Student[]
+}
+
+model Class {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  name      String   @db.VarChar(191)
+  schoolId  String   @db.VarChar(100)
+  school    School   @relation(fields: [schoolId], references: [id])
+  students  Student[]
+  teachers  Teacher[]
+  timetables Timetable[]
+  exams     Exam[]
+  homeworks Homework[]
+  resources Resource[]
+}
+
+model Subject {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  name      String   @db.VarChar(191)
+  schoolId  String   @db.VarChar(100)
+  school    School   @relation(fields: [schoolId], references: [id])
+  teachers  Teacher[]
+  grades    Grade[]
+  timetables Timetable[]
+  exams     Exam[]
+  resources Resource[]
+}
+
+model Grade {
+  id          String   @id @default(uuid()) @db.VarChar(100)
+  value       Float
+  coefficient Float    @default(1)
+  comment     String?  @db.Text
+  date        DateTime @default(now())
+  studentId   String   @db.VarChar(100)
+  student     Student  @relation(fields: [studentId], references: [id])
+  subjectId   String   @db.VarChar(100)
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model Attendance {
+  id          String   @id @default(uuid()) @db.VarChar(100)
+  date        DateTime
+  status      String   @db.VarChar(100)
+  justified   Boolean  @default(false)
+  justification String? @db.Text
+  studentId   String   @db.VarChar(100)
+  student     Student  @relation(fields: [studentId], references: [id])
+}
+
+model Timetable {
+  id        String   @id @default(uuid())
+  day       String
+  startTime String
+  endTime   String
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id])
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String   @db.Text
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  createdAt  DateTime @default(now())
+  isRead     Boolean  @default(false)
+}
+
+model Exam {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  title     String   @db.VarChar(191)
+  date      DateTime
+  classId   String   @db.VarChar(100)
+  class     Class    @relation(fields: [classId], references: [id])
+  subjectId String   @db.VarChar(100)
+  subject   Subject  @relation(fields: [subjectId], references: [id])
+}
+
+model Homework {
+  id          String   @id @default(uuid()) @db.VarChar(100)
+  title       String   @db.VarChar(191)
+  description String?  @db.Text
+  dueDate     DateTime
+  fileUrl     String?  @db.VarChar(191)
+  classId     String   @db.VarChar(100)
+  class       Class    @relation(fields: [classId], references: [id])
+}
+
+model Resource {
+  id          String   @id @default(uuid())
+  title       String
+  type        String   
+  fileUrl     String
+  size        String?
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id])
+  classId     String?
+  class       Class?   @relation(fields: [classId], references: [id])
+  teacherId   String?
+  teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  createdAt   DateTime @default(now())
+}
