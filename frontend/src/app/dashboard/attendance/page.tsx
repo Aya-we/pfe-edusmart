@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 import { useAuth } from "@/context/AuthContext";
 
 export default function StudentAttendancePage() {
@@ -32,7 +34,7 @@ export default function StudentAttendancePage() {
     const fetchAttendance = async () => {
       if (!user?.id) return;
       try {
-        const response = await axios.get(`http://localhost:4000/attendance/student/${user.id}`);
+        const response = await axios.get(`${API}/attendance/student/${user.id}`);
         setAbsences(response.data);
       } catch (error) {
         console.error("Error fetching attendance:", error);
@@ -47,10 +49,10 @@ export default function StudentAttendancePage() {
     // Simulation d'upload pour le moment, mais l'API est là
     const fileUrl = "certificat_medical.jpg"; 
     try {
-      await axios.post(`http://localhost:4000/attendance/${id}/submit-justification`, { fileUrl });
+      await axios.post(`${API}/attendance/${id}/submit-justification`, { fileUrl });
       alert("Demande de justification envoyée !");
       // Re-fetch data
-      const response = await axios.get(`http://localhost:4000/attendance/student/${user?.id}`);
+      const response = await axios.get(`${API}/attendance/student/${user?.id}`);
       setAbsences(response.data);
     } catch (error) {
       alert("Erreur lors de l'envoi.");
@@ -147,3 +149,4 @@ export default function StudentAttendancePage() {
     </div>
   );
 }
+

@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 const FILE_ICONS: Record<string, any> = {
   pdf:      FileText,
@@ -310,3 +310,5 @@ export default function LibraryPage() {
     </div>
   );
 }
+
+

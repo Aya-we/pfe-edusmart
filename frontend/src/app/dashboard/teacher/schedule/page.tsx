@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 export default function TeacherSchedulePage() {
   const [status,   setStatus]   = useState<"loading" | "available" | "unavailable">("loading");
@@ -90,3 +90,5 @@ export default function TeacherSchedulePage() {
     </div>
   );
 }
+
+

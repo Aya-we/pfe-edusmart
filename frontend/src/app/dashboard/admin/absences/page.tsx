@@ -23,13 +23,15 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 export default function AdminAbsencesPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPending = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/attendance/pending");
+      const response = await axios.get("${API}/attendance/pending");
       setRequests(response.data);
     } catch (error) {
       console.error("Error fetching pending justifications:", error);
@@ -44,7 +46,7 @@ export default function AdminAbsencesPage() {
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {
     try {
-      await axios.put(`http://localhost:4000/attendance/${id}/${action}`);
+      await axios.put(`${API}/attendance/${id}/${action}`);
       alert(action === 'approve' ? "Justification validée !" : "Justification refusée.");
       fetchPending();
     } catch (error) {
@@ -142,3 +144,4 @@ export default function AdminAbsencesPage() {
     </div>
   );
 }
+

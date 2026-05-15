@@ -10,7 +10,7 @@ import { UserPlus, Trash2, Edit2, X, Loader2, Users } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 const ROLE_COLORS: Record<string, string> = {
   STUDENT: "bg-blue-50 text-blue-700 border-blue-200",
@@ -327,3 +327,5 @@ export default function UsersManagementPage() {
     </div>
   );
 }
+
+

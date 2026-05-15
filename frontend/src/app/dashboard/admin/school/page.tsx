@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 export default function SchoolManagementPage() {
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function SchoolManagementPage() {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get("http://localhost:4000/classes");
+      const response = await axios.get("${API}/classes");
       setClasses(response.data);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -43,10 +45,10 @@ export default function SchoolManagementPage() {
     e.preventDefault();
     try {
       // En vrai on récupère le schoolId du user connecté
-      const schoolIdRes = await axios.get("http://localhost:4000/users");
+      const schoolIdRes = await axios.get("${API}/users");
       const schoolId = schoolIdRes.data[0].schoolId;
 
-      await axios.post("http://localhost:4000/classes", {
+      await axios.post("${API}/classes", {
         name: newClassName,
         schoolId: schoolId
       });
@@ -148,3 +150,4 @@ export default function SchoolManagementPage() {
     </div>
   );
 }
+

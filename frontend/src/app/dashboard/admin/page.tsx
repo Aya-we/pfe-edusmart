@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 const ROLE_LABELS: Record<string, string> = {
   STUDENT: "Étudiant",
@@ -174,3 +174,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+

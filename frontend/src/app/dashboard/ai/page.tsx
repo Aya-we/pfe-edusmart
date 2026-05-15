@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 const suggestions = [
   { text: "Expliquer la leçon sur les dérivées", icon: BrainCircuit },
   { text: "Conseils pour améliorer ma moyenne", icon: Target },
@@ -41,7 +43,7 @@ export default function EduSmartAIPage() {
     setIsTyping(true);
 
     try {
-      const response = await axios.post("http://localhost:4000/ai/chat", {
+      const response = await axios.post("${API}/ai/chat", {
         prompt: text,
         context: {
           studentName: "Ahmed",
@@ -161,3 +163,4 @@ export default function EduSmartAIPage() {
     </div>
   );
 }
+

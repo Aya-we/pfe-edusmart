@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 export default function MessagesPage() {
   const { user } = useAuth();
@@ -268,3 +268,5 @@ export default function MessagesPage() {
     </div>
   );
 }
+
+

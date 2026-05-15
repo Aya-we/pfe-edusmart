@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 interface ChildData {
   id: string;
@@ -244,3 +244,5 @@ export default function ParentDashboard() {
     </div>
   );
 }
+
+

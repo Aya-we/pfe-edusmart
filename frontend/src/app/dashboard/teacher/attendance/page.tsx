@@ -32,6 +32,8 @@ import {
 import { cn } from "@/lib/utils";
 import axios from "axios";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 export default function AttendancePage() {
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string>("");
@@ -42,7 +44,7 @@ export default function AttendancePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classesRes = await axios.get("http://localhost:4000/classes");
+        const classesRes = await axios.get("${API}/classes");
         setClasses(classesRes.data);
         if (classesRes.data.length > 0) {
           setSelectedClassId(classesRes.data[0].id);
@@ -61,7 +63,7 @@ export default function AttendancePage() {
       if (!selectedClassId) return;
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:4000/attendance/class/${selectedClassId}?date=${new Date().toISOString()}`);
+        const response = await axios.get(`${API}/attendance/class/${selectedClassId}?date=${new Date().toISOString()}`);
         setStudents(response.data.map((s: any) => ({
           ...s,
           status: s.attendance?.status || "PRESENT"
@@ -82,7 +84,7 @@ export default function AttendancePage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await axios.post("http://localhost:4000/attendance/bulk", {
+      await axios.post("${API}/attendance/bulk", {
         date: new Date().toISOString(),
         classId: selectedClassId,
         records: students.map(s => ({
@@ -200,3 +202,4 @@ export default function AttendancePage() {
     </div>
   );
 }
+

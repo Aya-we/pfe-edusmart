@@ -23,6 +23,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post("http://localhost:4000/auth/login", { email, password });
+      const response = await axios.post(`${API}/auth/login`, { email, password });
       const { access_token, user } = response.data;
       
       setToken(access_token);
@@ -87,3 +89,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

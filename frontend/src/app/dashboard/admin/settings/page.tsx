@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+
 export default function AdminSettingsPage() {
   const [school, setSchool] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     const fetchSchool = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/schools");
+        const response = await axios.get("${API}/schools");
         if (response.data.length > 0) {
           setSchool(response.data[0]);
         }
@@ -46,7 +48,7 @@ export default function AdminSettingsPage() {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await axios.put(`http://localhost:4000/schools/${school.id}`, school);
+      await axios.put(`${API}/schools/${school.id}`, school);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
@@ -160,3 +162,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+

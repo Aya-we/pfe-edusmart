@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 import { useAuth } from "@/context/AuthContext";
 
 export default function StudentGradesPage() {
@@ -32,7 +34,7 @@ export default function StudentGradesPage() {
     const fetchGrades = async () => {
       if (!user?.id) return;
       try {
-        const response = await axios.get(`http://localhost:4000/grades/averages/${user.id}`);
+        const response = await axios.get(`${API}/grades/averages/${user.id}`);
         setAverages(response.data);
       } catch (error) {
         console.error("Error fetching grades:", error);
@@ -109,3 +111,4 @@ export default function StudentGradesPage() {
     </div>
   );
 }
+

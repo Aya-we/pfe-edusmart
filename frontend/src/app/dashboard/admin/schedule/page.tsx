@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 type PdfType = "students" | "teachers";
 
@@ -198,3 +198,5 @@ export default function AdminSchedulePage() {
     </div>
   );
 }
+
+

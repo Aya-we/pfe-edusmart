@@ -11,7 +11,7 @@ import { Save, BookOpen, Filter, Loader2, CheckCircle2, Users } from "lucide-rea
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
-const API = "http://localhost:4000";
+const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
 
 export default function GradebookPage() {
   const { user } = useAuth();
@@ -262,3 +262,5 @@ export default function GradebookPage() {
     </div>
   );
 }
+
+
