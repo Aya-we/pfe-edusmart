@@ -23,7 +23,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API = process.env.NEXT_PUBLIC_API_URL || "https://edusmart-dy41.onrender.com";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://edusmart-dy4i.onrender.com";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
