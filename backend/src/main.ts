@@ -23,7 +23,9 @@ async function bootstrap() {
   app.enableCors({
     origin: 'https://pfe-edusmart-vcyv.vercel.app',
     credentials: true,
-  });  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+  });
+
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
     prefix: '/uploads',
   });
 
