@@ -7,9 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
   app.enableCors({
-    origin: '*',
+    origin: ['https://pfe-edusmart-vcyv.vercel.app', 'http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
   });
 
   // Serve static files from uploads directory
