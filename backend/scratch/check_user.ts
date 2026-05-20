@@ -10,10 +10,12 @@ async function main() {
   if (user) console.log('USER_ROLE:', user.role);
 }
 
-try {
-  await main();
-} catch (e) {
-  console.error(e);
-} finally {
-  await prisma.$disconnect();
-}
+(async () => {
+  try {
+    await main();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await prisma.$disconnect();
+  }
+})();
