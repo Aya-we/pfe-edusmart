@@ -186,18 +186,18 @@ export default function LibraryPage() {
                       <div className="flex gap-1">
                         <a href={res.fileUrl} target="_blank" rel="noreferrer">
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-foreground hover:text-background transition-all">
-                            <Eye className="w-3.5 h-3.5" />
+                            <Eye className="w-30.5 h-30.5" />
                           </Button>
                         </a>
                         <a href={res.fileUrl} download>
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-foreground hover:text-background transition-all">
-                            <Download className="w-3.5 h-3.5" />
+                            <Download className="w-30.5 h-30.5" />
                           </Button>
                         </a>
                         {canUpload && (
                           <Button variant="ghost" size="sm" onClick={() => handleDelete(res.id)}
                             className="h-8 w-8 p-0 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-all">
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-30.5 h-30.5" />
                           </Button>
                         )}
                       </div>
@@ -233,7 +233,7 @@ export default function LibraryPage() {
               ) : (
                 <form onSubmit={handleUpload} className="space-y-5">
                   {/* Titre */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Titre du cours</label>
                     <Input value={title} onChange={e => setTitle(e.target.value)}
                       placeholder="Ex: Chapitre 3 — Algèbre linéaire"
@@ -241,7 +241,7 @@ export default function LibraryPage() {
                   </div>
 
                   {/* Classe */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Classe</label>
                     <select className="w-full h-11 rounded-xl border border-border bg-muted/5 px-3 text-sm outline-none font-bold"
                       value={classId} onChange={e => setClassId(e.target.value)}>
@@ -251,7 +251,7 @@ export default function LibraryPage() {
                   </div>
 
                   {/* Matière */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Matière</label>
                     <select className="w-full h-11 rounded-xl border border-border bg-muted/5 px-3 text-sm outline-none font-bold"
                       value={subjectId} onChange={e => setSubjectId(e.target.value)}>
@@ -261,7 +261,7 @@ export default function LibraryPage() {
                   </div>
 
                   {/* Fichier */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Fichier (PDF, vidéo, document)</label>
                     <div
                       className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${file ? "border-foreground bg-muted/10" : "border-border hover:border-foreground/30"}`}

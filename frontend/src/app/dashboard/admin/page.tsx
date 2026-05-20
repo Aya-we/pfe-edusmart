@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { 
-  Users, GraduationCap, School, TrendingUp, 
-  AlertCircle, UserPlus, Loader2, BookOpen,
+  Users, GraduationCap, School, 
+  Loader2, BookOpen,
   ArrowRight
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
                   <p className="text-xs text-muted-foreground">{formatDate(u.createdAt)}</p>
                 </div>
                 <span className={cn(
-                  "text-[10px] font-bold px-2 py-0.5 rounded-full border",
+                  "text-[10px] font-bold px-2 py-00.5 rounded-full border",
                   u.role === "STUDENT" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900" :
                   u.role === "TEACHER" ? "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900" :
                   "bg-muted text-muted-foreground border-border"
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
                     {c._count?.students ?? 0} élève(s)
                   </p>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900">
+                <span className="text-[10px] font-bold px-2 py-00.5 rounded-full bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900">
                   Active
                 </span>
               </div>

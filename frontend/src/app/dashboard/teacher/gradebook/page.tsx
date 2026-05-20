@@ -99,12 +99,12 @@ export default function GradebookPage() {
       const calls: Promise<any>[] = [];
       students.forEach(student => {
         student.grades.forEach((val: string, idx: number) => {
-          if (val === "" || isNaN(parseFloat(val))) return;
+          if (val === "" || isNaN(Number.parseFloat(val))) return;
           calls.push(
             axios.post(`${API}/grades`, {
               studentId:  student.id,
               subjectId:  selectedSubjectId,
-              value:      parseFloat(val),
+              value:      Number.parseFloat(val),
               type:       idx === 0 ? "CC1" : idx === 1 ? "CC2" : "EXAM",
             })
           );
@@ -123,7 +123,7 @@ export default function GradebookPage() {
 
   /* ── Calcul moyenne ── */
   const avg = (grades: string[]) => {
-    const nums = grades.filter(g => g !== "" && !isNaN(parseFloat(g))).map(parseFloat);
+    const nums = grades.filter(g => g !== "" && !isNaN(Number.parseFloat(g))).map(parseFloat);
     return nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(2) : "—";
   };
 
@@ -236,7 +236,7 @@ export default function GradebookPage() {
                     </TableCell>
                   ))}
                   <TableCell className="text-right pr-8">
-                    <span className={`text-lg font-black ${parseFloat(avg(student.grades)) >= 10 ? 'text-green-600' : avg(student.grades) !== '—' ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    <span className={`text-lg font-black ${Number.parseFloat(avg(student.grades)) >= 10 ? 'text-green-600' : avg(student.grades) !== '—' ? 'text-red-500' : 'text-muted-foreground'}`}>
                       {avg(student.grades)}
                     </span>
                   </TableCell>

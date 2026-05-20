@@ -5,8 +5,8 @@ import { NotificationsGateway } from '../notifications/notifications.gateway';
 @Injectable()
 export class AttendanceService {
   constructor(
-    private prisma: PrismaService,
-    private notificationsGateway: NotificationsGateway,
+    private readonly prisma: PrismaService,
+    private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
   async markBulk(data: { date: Date; classId: string; records: { studentId: string; status: string }[] }) {

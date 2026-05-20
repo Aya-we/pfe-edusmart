@@ -83,7 +83,7 @@ export default function StudentDashboard() {
                   </div>
                   <div>
                     <p className="font-bold">PDF de la semaine disponible</p>
-                    <p className="text-xs opacity-70 mt-0.5">{timetable.filename}</p>
+                    <p className="text-xs opacity-70 mt-00.5">{timetable.filename}</p>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
@@ -94,7 +94,7 @@ export default function StudentDashboard() {
                   </a>
                   <a href={`${API}/timetable-upload/latest`} download>
                     <Button size="sm" variant="secondary" className="rounded-xl h-9 gap-2 font-bold text-xs">
-                      <Download className="w-3.5 h-3.5" />
+                      <Download className="w-30.5 h-30.5" />
                       Télécharger
                     </Button>
                   </a>
@@ -107,7 +107,7 @@ export default function StudentDashboard() {
                 </div>
                 <div>
                   <p className="font-bold text-sm">Aucun emploi du temps disponible</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">L'administration n'a pas encore publié le PDF de cette semaine.</p>
+                  <p className="text-xs text-muted-foreground mt-00.5">L'administration n'a pas encore publié le PDF de cette semaine.</p>
                 </div>
               </div>
             )}

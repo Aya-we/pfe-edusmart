@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { 
   School, 
   Plus, 
-  Search, 
+  
   MoreHorizontal, 
   Users, 
   BookOpen,
@@ -92,7 +92,7 @@ export default function SchoolManagementPage() {
             <Card key={cls.id} className="rounded-2xl border border-border bg-background hover:border-foreground transition-all duration-300 group shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-6">
-                  <div className="p-2.5 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                  <div className="p-20.5 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
                     <School className="w-5 h-5" />
                   </div>
                   <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
@@ -101,12 +101,12 @@ export default function SchoolManagementPage() {
                 <h3 className="text-xl font-bold tracking-tight mb-4">{cls.name}</h3>
                 
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1.5 font-medium">
+                  <div className="flex items-center gap-10.5 font-medium">
                     <Users className="w-4 h-4" />
                     {cls.students?.length || 0} Élèves
                   </div>
                   <div className="w-1 h-1 rounded-full bg-border" />
-                  <div className="flex items-center gap-1.5 font-medium">
+                  <div className="flex items-center gap-10.5 font-medium">
                     <BookOpen className="w-4 h-4" />
                     Actif
                   </div>
@@ -126,7 +126,7 @@ export default function SchoolManagementPage() {
             </div>
 
             <form onSubmit={handleCreateClass} className="space-y-4">
-              <div className="space-y-1.5">
+              <div className="space-y-10.5">
                 <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom de la classe</label>
                 <Input 
                   required 

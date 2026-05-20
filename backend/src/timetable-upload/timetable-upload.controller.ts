@@ -6,7 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import type { Response } from 'express';
 import { TimetableUploadService } from './timetable-upload.service';
-import * as path from 'path';
+import * as path from 'node:path';
 
 const makeStorage = (prefix: string) => diskStorage({
   destination: (req, file, cb) =>

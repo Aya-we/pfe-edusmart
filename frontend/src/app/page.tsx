@@ -26,7 +26,7 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 glass border-b border-border/40 px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="bg-primary text-primary-foreground p-1.5 rounded-lg">
+          <div className="bg-primary text-primary-foreground p-10.5 rounded-lg">
             <GraduationCap className="w-6 h-6" />
           </div>
           <span className="font-bold text-xl tracking-tight">EduSmart</span>
@@ -63,7 +63,7 @@ export default function LandingPage() {
             variants={containerVariants}
           >
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-xs font-semibold mb-6">
-              <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-[10px]">NOUVEAU</span>
+              <span className="bg-primary text-primary-foreground px-2 py-00.5 rounded-full text-[10px]">NOUVEAU</span>
               <span>L'intelligence artificielle au service de l'éducation</span>
             </motion.div>
             

@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, Trash2, Edit2, X, Loader2, Users } from "lucide-react";
+import { UserPlus, Trash2, Edit2, X, Loader2 } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
@@ -128,7 +128,7 @@ export default function UsersManagementPage() {
 
   /* ─── Delete ─── */
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
+    if (!globalThis.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) return;
     try {
       await axios.delete(`${API}/users/${id}`);
       fetchData();
@@ -175,7 +175,7 @@ export default function UsersManagementPage() {
                 <TableCell className="pl-6 font-medium">{u.firstName} {u.lastName}</TableCell>
                 <TableCell className="text-muted-foreground text-sm">{u.email}</TableCell>
                 <TableCell>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-widest ${ROLE_COLORS[u.role] ?? "bg-muted text-muted-foreground border-border"}`}>
+                  <span className={`text-[10px] font-bold px-2 py-00.5 rounded-full border uppercase tracking-widest ${ROLE_COLORS[u.role] ?? "bg-muted text-muted-foreground border-border"}`}>
                     {u.role}
                   </span>
                 </TableCell>
@@ -224,7 +224,7 @@ export default function UsersManagementPage() {
               {/* Prénom / Nom */}
               <div className="grid grid-cols-2 gap-4">
                 {[["Prénom", "firstName"], ["Nom", "lastName"]].map(([label, key]) => (
-                  <div key={key} className="space-y-1.5">
+                  <div key={key} className="space-y-10.5">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</label>
                     <Input required value={(formData as any)[key]}
                       onChange={e => setFormData(p => ({ ...p, [key]: e.target.value }))}
@@ -234,7 +234,7 @@ export default function UsersManagementPage() {
               </div>
 
               {/* Email */}
-              <div className="space-y-1.5">
+              <div className="space-y-10.5">
                 <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Email</label>
                 <Input type="email" required value={formData.email}
                   onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
@@ -243,7 +243,7 @@ export default function UsersManagementPage() {
 
               {/* Mot de passe (création seulement) */}
               {!isEditing && (
-                <div className="space-y-1.5">
+                <div className="space-y-10.5">
                   <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Mot de passe</label>
                   <Input type="password" required value={formData.password}
                     onChange={e => setFormData(p => ({ ...p, password: e.target.value }))}
@@ -252,7 +252,7 @@ export default function UsersManagementPage() {
               )}
 
               {/* Rôle */}
-              <div className="space-y-1.5">
+              <div className="space-y-10.5">
                 <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Rôle</label>
                 <select className="w-full h-11 rounded-xl border border-border bg-muted/5 px-3 text-sm outline-none font-bold"
                   value={formData.role} onChange={e => setFormData(p => ({ ...p, role: e.target.value }))}>
@@ -269,7 +269,7 @@ export default function UsersManagementPage() {
                   <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Informations étudiant</p>
                   
                   {/* Classe */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-semibold text-muted-foreground">Classe</label>
                     <select className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none font-bold"
                       value={formData.classId} onChange={e => setFormData(p => ({ ...p, classId: e.target.value }))}>
@@ -279,7 +279,7 @@ export default function UsersManagementPage() {
                   </div>
 
                   {/* 🆕 Parent */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-10.5">
                     <label className="text-xs font-semibold text-muted-foreground">Parent (optionnel)</label>
                     <select className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none font-bold"
                       value={formData.parentId} onChange={e => setFormData(p => ({ ...p, parentId: e.target.value }))}>

@@ -35,16 +35,16 @@ export default function MyClassesPage() {
             className="group rounded-2xl border border-border bg-background p-8 hover:border-foreground transition-all duration-300 shadow-sm"
           >
             <div className="flex items-start justify-between mb-8">
-              <div className="space-y-1.5">
+              <div className="space-y-10.5">
                 <h3 className="text-2xl font-bold tracking-tight">{cls.name}</h3>
                 <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium">
                   <div className="flex items-center gap-1">
-                    <BookOpen className="w-3.5 h-3.5" />
+                    <BookOpen className="w-30.5 h-30.5" />
                     {cls.subject}
                   </div>
                   <div className="w-1 h-1 rounded-full bg-border" />
                   <div className="flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5" />
+                    <Users className="w-30.5 h-30.5" />
                     {cls.studentsCount} Élèves
                   </div>
                 </div>

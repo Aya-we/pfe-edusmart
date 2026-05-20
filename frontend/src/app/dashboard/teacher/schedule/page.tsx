@@ -67,7 +67,7 @@ export default function TeacherSchedulePage() {
                 <div className="p-3 rounded-xl bg-foreground text-background"><FileText className="w-5 h-5" /></div>
                 <div>
                   <p className="font-bold">Emploi du temps — Professeurs</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{filename}</p>
+                  <p className="text-xs text-muted-foreground mt-00.5">{filename}</p>
                 </div>
               </div>
               <div className="flex gap-3">

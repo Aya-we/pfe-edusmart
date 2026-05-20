@@ -2,8 +2,8 @@ import { Controller, Get, Post, Delete, Param, UseInterceptors, UploadedFile, Bo
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ResourcesService } from './resources.service';
-import * as path from 'path';
-import * as fs from 'fs';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'resources');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -24,7 +24,7 @@ export class ResourcesController {
       destination: UPLOAD_DIR,
       filename: (req, file, cb) => {
         const ext  = path.extname(file.originalname);
-        const name = path.basename(file.originalname, ext).replace(/\s+/g, '_');
+        const name = path.basename(file.originalname, ext).replaceAll(/\s+/g, '_');
         cb(null, `${name}_${Date.now()}${ext}`);
       },
     }),

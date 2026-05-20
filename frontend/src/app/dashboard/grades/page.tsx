@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  GraduationCap, 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle2, 
+  
+  
+  
+  
   Target,
   ArrowRight,
   Loader2
@@ -82,9 +82,9 @@ export default function StudentGradesPage() {
                     <TableCell className="text-center font-black text-lg">{avg.average}</TableCell>
                     <TableCell className="text-right pr-8">
                       <div className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                        parseFloat(avg.average) >= 10 ? 'border-foreground bg-foreground text-background' : 'border-destructive text-destructive'
+                        Number.parseFloat(avg.average) >= 10 ? 'border-foreground bg-foreground text-background' : 'border-destructive text-destructive'
                       }`}>
-                        {parseFloat(avg.average) >= 10 ? 'Validé' : 'Échec'}
+                        {Number.parseFloat(avg.average) >= 10 ? 'Validé' : 'Échec'}
                       </div>
                     </TableCell>
                   </TableRow>

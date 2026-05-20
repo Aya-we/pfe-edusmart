@@ -116,9 +116,9 @@ export default function EduSmartAIPage() {
                 <Bot className="w-5 h-5" />
               </div>
               <div className="bg-muted/50 p-5 rounded-2xl border border-border flex gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-foreground/30 animate-bounce" />
-                <div className="w-1.5 h-1.5 rounded-full bg-foreground/30 animate-bounce [animation-delay:0.2s]" />
-                <div className="w-1.5 h-1.5 rounded-full bg-foreground/30 animate-bounce [animation-delay:0.4s]" />
+                <div className="w-10.5 h-10.5 rounded-full bg-foreground/30 animate-bounce" />
+                <div className="w-10.5 h-10.5 rounded-full bg-foreground/30 animate-bounce [animation-delay:0.2s]" />
+                <div className="w-10.5 h-10.5 rounded-full bg-foreground/30 animate-bounce [animation-delay:0.4s]" />
               </div>
             </motion.div>
           )}

@@ -1,0 +1,6 @@
+projectKey=Edu-smart
+serverUrl=http://localhost:9000
+serverVersion=26.1.0.118079
+dashboardUrl=http://localhost:9000/dashboard?id=Edu-smart
+ceTaskId=56195e03-382b-4e81-9adc-41724850ee18
+ceTaskUrl=http://localhost:9000/api/ce/task?id=56195e03-382b-4e81-9adc-41724850ee18

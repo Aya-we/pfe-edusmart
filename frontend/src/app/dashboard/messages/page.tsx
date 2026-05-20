@@ -131,7 +131,7 @@ export default function MessagesPage() {
                   <button
                     key={u.id}
                     onClick={() => startConversation(u)}
-                    className="w-full text-left px-4 py-2.5 hover:bg-muted/50 transition-all flex items-center gap-3"
+                    className="w-full text-left px-4 py-20.5 hover:bg-muted/50 transition-all flex items-center gap-3"
                   >
                     <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-bold">
                       {initials(`${u.firstName} ${u.lastName}`)}

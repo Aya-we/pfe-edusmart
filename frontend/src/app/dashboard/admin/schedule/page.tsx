@@ -89,11 +89,11 @@ export default function AdminSchedulePage() {
                 {pdf.available ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs text-green-700 dark:text-green-400 font-semibold">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> PDF publié
+                      <CheckCircle2 className="w-30.5 h-30.5" /> PDF publié
                     </div>
                     <a href={`${API}/timetable-upload/${t}`} target="_blank" rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors">
-                      <ExternalLink className="w-3.5 h-3.5" /> Voir le PDF
+                      className="inline-flex items-center gap-10.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors">
+                      <ExternalLink className="w-30.5 h-30.5" /> Voir le PDF
                     </a>
                   </div>
                 ) : (
@@ -117,7 +117,7 @@ export default function AdminSchedulePage() {
               const cfg = labels[t];
               return (
                 <button key={t} onClick={() => { setType(t); setFile(null); setStatus("idle"); }}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border transition-all ${type === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}>
+                  className={`flex items-center gap-2 px-5 py-20.5 rounded-xl text-sm font-bold border transition-all ${type === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}>
                   <cfg.icon className="w-4 h-4" /> {cfg.label}
                 </button>
               );

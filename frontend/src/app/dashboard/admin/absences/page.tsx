@@ -6,8 +6,8 @@ import {
   Check, 
   X, 
   Eye, 
-  FileText, 
-  User, 
+  
+  
   Calendar,
   AlertCircle,
   Loader2
@@ -110,9 +110,9 @@ export default function AdminAbsencesPage() {
                       variant="ghost" 
                       size="sm" 
                       className="h-8 rounded-lg border border-border gap-2 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground hover:text-background transition-all"
-                      onClick={() => window.open(item.justification, '_blank')}
+                      onClick={() => globalThis.open(item.justification, '_blank')}
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-30.5 h-30.5" />
                       Voir le fichier
                     </Button>
                   </TableCell>

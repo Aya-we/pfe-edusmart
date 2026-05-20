@@ -119,7 +119,7 @@ export default function ParentDashboard() {
             <div className="flex gap-3 flex-wrap">
               {children.map(child => (
                 <button key={child.id} onClick={() => setSelected(child.id)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-bold border transition-all ${
+                  className={`px-5 py-20.5 rounded-xl text-sm font-bold border transition-all ${
                     selected === child.id
                       ? "bg-foreground text-background border-foreground"
                       : "border-border text-muted-foreground hover:border-foreground/30"
@@ -145,7 +145,7 @@ export default function ParentDashboard() {
                       <h3 className="text-2xl font-black tracking-tight">
                         {activeChild.user.firstName} {activeChild.user.lastName}
                       </h3>
-                      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-0.5">
+                      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-00.5">
                         {activeChild.class?.name ?? "—"}
                       </p>
                     </div>
@@ -155,7 +155,7 @@ export default function ParentDashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-6 rounded-2xl bg-muted/30 border border-border/50 text-center">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Moyenne Générale</p>
-                      <p className={`text-3xl font-black ${activeChild.avgGeneral !== "—" ? parseFloat(activeChild.avgGeneral) >= 10 ? "text-green-600" : "text-red-500" : ""}`}>
+                      <p className={`text-3xl font-black ${activeChild.avgGeneral !== "—" ? Number.parseFloat(activeChild.avgGeneral) >= 10 ? "text-green-600" : "text-red-500" : ""}`}>
                         {activeChild.avgGeneral}
                       </p>
                       {activeChild.avgGeneral !== "—" && <p className="text-xs text-muted-foreground">/20</p>}
@@ -185,7 +185,7 @@ export default function ParentDashboard() {
                     {activeChild.grades.slice(0, 3).map((g: any, i: number) => (
                       <div key={i} className="p-5 rounded-2xl border border-border bg-background hover:border-foreground/20 transition-all">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{g.subjectName ?? "Matière"}</p>
-                        <p className={`text-2xl font-black mb-0.5 ${(g.average ?? 0) >= 10 ? "text-green-600" : "text-red-500"}`}>
+                        <p className={`text-2xl font-black mb-00.5 ${(g.average ?? 0) >= 10 ? "text-green-600" : "text-red-500"}`}>
                           {(g.average ?? 0).toFixed(1)}
                         </p>
                         <p className="text-xs text-muted-foreground">/20</p>
@@ -211,7 +211,7 @@ export default function ParentDashboard() {
                             </p>
                           </div>
                         </div>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${a.justified ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                        <span className={`text-xs font-bold px-2 py-00.5 rounded-full ${a.justified ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
                           {a.justified ? "Justifiée" : "Non justifiée"}
                         </span>
                       </div>

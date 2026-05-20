@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  ClipboardCheck, 
+  
   AlertCircle, 
   CheckCircle2, 
   Calendar as CalendarIcon,
@@ -109,7 +109,7 @@ export default function StudentAttendancePage() {
                     {new Date(absence.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                    <span className={`inline-flex items-center gap-10.5 px-20.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                       absence.status === 'PRESENT'
                         ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900'
                         : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900'

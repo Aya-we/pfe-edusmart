@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  Settings, 
+  
   Save, 
   Building, 
-  Globe, 
-  Phone, 
-  MapPin, 
+  
+  
+  
   ShieldCheck,
   Loader2,
   CheckCircle2,
