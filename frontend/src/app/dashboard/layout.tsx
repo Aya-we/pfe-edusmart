@@ -128,11 +128,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside className="w-56 border-r border-border bg-background flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-border">
-          <div className="flex items-center gap-2">
-            <div className="bg-foreground text-background p-1.5 rounded-md">
-              <GraduationCap className="w-4 h-4" />
+          <div className="flex items-center gap-3">
+            <div className="bg-foreground text-background p-2 rounded-md shadow-sm">
+              <GraduationCap className="w-5 h-5" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-foreground">EduSmart</span>
+            <span className="font-bold text-xl tracking-tight text-foreground">EduSmart</span>
           </div>
         </div>
 
