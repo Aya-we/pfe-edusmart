@@ -58,10 +58,15 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleLogoUpload = (e: any) => {
-    // Simulation d'upload pour le moment (URL fictive)
-    setSchool({...school, logo: "https://api.dicebear.com/7.x/initials/svg?seed=ES"});
-    alert("Logo sélectionné ! (Prêt pour l'enregistrement)");
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSchool({ ...school, logo: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   if (loading) return (
