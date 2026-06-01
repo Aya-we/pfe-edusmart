@@ -26,8 +26,8 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 glass border-b border-border/40 px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="bg-primary text-primary-foreground p-10.5 rounded-lg">
-            <GraduationCap className="w-6 h-6" />
+          <div className="bg-primary text-primary-foreground p-2 rounded-lg">
+            <GraduationCap className="w-5 h-5" />
           </div>
           <span className="font-bold text-xl tracking-tight">EduSmart</span>
         </div>
