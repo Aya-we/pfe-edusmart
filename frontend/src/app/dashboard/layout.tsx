@@ -126,23 +126,23 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-screen bg-muted/20">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-background flex flex-col">
-        <div className="h-20 flex items-center px-8 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="bg-foreground text-background p-10.5 rounded-md">
-              <GraduationCap className="w-5 h-5" />
+      <aside className="w-56 border-r border-border bg-background flex flex-col">
+        <div className="h-16 flex items-center px-6 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="bg-foreground text-background p-1.5 rounded-md">
+              <GraduationCap className="w-4 h-4" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-foreground">EduSmart</span>
+            <span className="font-bold text-lg tracking-tight text-foreground">EduSmart</span>
           </div>
         </div>
 
-        <nav className="flex-1 p-6 space-y-2">
+        <nav className="flex-1 p-4 space-y-1">
           {sidebarItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-20.5 rounded-lg text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                 pathname === item.href
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -170,7 +170,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header */}
         <header className="h-16 border-b border-border bg-background flex items-center justify-between px-8">
-          <div className="flex items-center bg-muted/50 rounded-xl px-3 py-10.5 w-96">
+          <div className="flex items-center bg-muted/50 rounded-xl px-3 py-1.5 w-96">
             <Search className="w-4 h-4 text-muted-foreground" />
             <input
               type="text"
@@ -189,7 +189,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               >
                 <Bell className="w-5 h-5 text-muted-foreground" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-10.5 right-10.5 w-4 h-4 bg-destructive text-white rounded-full text-[9px] font-black flex items-center justify-center border-2 border-background">
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-destructive text-white rounded-full text-[9px] font-black flex items-center justify-center border-2 border-background">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
@@ -229,7 +229,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             !n.read && "border-l-2 border-l-foreground bg-muted/20"
                           )}>
                             <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center flex-shrink-0 mt-00.5">
+                              <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <MessageSquare className="w-4 h-4" />
                               </div>
                               <div className="flex-1 min-w-0">
