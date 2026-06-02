@@ -203,7 +203,7 @@ export default function UsersManagementPage() {
                       )}
                     </div>
                   )}
-                  {u.role === "TEACHER" && (u.teacher?.classes?.map((c: any) => c.name).join(", ") || "—")}
+                  {u.role === "TEACHER" && (u.teacher?.classes?.map((c: any) => c.name)?.join(", ") || "—")}
                   {(u.role === "ADMIN" || u.role === "PARENT") && "—"}
                 </TableCell>
                 <TableCell className="text-right pr-6">
