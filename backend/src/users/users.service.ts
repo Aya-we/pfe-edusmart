@@ -15,7 +15,7 @@ export class UsersService {
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { classes: true } },
+        teacher: true, // Temporary fix: removed { include: { classes: true } } because _ClassToTeacher table is missing on Render database
         parent: true,
       },
     });
