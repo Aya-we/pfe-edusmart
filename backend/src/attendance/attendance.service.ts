@@ -9,13 +9,12 @@ export class AttendanceService {
     private readonly notificationsGateway: NotificationsGateway,
   ) {}
 
-  async markBulk(data: { date: Date; classId: string; timetableId?: string; records: { studentId: string; status: string }[] }) {
+  async markBulk(data: { date: Date; classId: string; timeSlot?: string; records: { studentId: string; status: string }[] }) {
     const operations = data.records.map(async (record) => {
       // Upsert to handle multiple saves for the same slot
-      if (data.timetableId) {
-        // If timetableId is provided, we can look for an existing record
+      if (data.timeSlot) {
         const existing = await this.prisma.attendance.findFirst({
-          where: { studentId: record.studentId, timetableId: data.timetableId, date: {
+          where: { studentId: record.studentId, timeSlot: data.timeSlot, date: {
             gte: new Date(new Date(data.date).setHours(0,0,0,0)),
             lt: new Date(new Date(data.date).setHours(23,59,59,999))
           }}
@@ -42,7 +41,7 @@ export class AttendanceService {
           date: data.date,
           status: record.status,
           studentId: record.studentId,
-          timetableId: data.timetableId,
+          timeSlot: data.timeSlot,
         },
         include: { student: { include: { user: true } } }
       });

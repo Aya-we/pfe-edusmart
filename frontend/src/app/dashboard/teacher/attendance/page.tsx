@@ -100,8 +100,8 @@ export default function AttendancePage() {
           const attendanceMap: Record<string, string> = {};
           if (s.attendances && Array.isArray(s.attendances)) {
             s.attendances.forEach((att: any) => {
-              if (att.timetableId) {
-                attendanceMap[att.timetableId] = att.status;
+              if (att.timeSlot) {
+                attendanceMap[att.timeSlot] = att.status;
               }
             });
           }
@@ -158,7 +158,7 @@ export default function AttendancePage() {
         return axios.post(`${API}/attendance/bulk`, {
           date: new Date(date).toISOString(),
           classId: selectedClassId,
-          timetableId: slot,
+          timeSlot: slot,
           records: allRecords
         });
       });

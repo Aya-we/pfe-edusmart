@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Put, HttpException, HttpStatus } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 
 @Controller('attendance')
@@ -6,11 +6,16 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post('bulk')
-  markBulk(@Body() data: any) {
-    return this.attendanceService.markBulk({
-      ...data,
-      date: new Date(data.date),
-    });
+  async markBulk(@Body() data: any) {
+    try {
+      return await this.attendanceService.markBulk({
+        ...data,
+        date: new Date(data.date),
+      });
+    } catch (error: any) {
+      console.error('Error in markBulk:', error);
+      throw new HttpException(error.message || 'Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get('class/:classId')

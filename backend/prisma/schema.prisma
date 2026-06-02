@@ -129,6 +129,7 @@ model Attendance {
   student     Student  @relation(fields: [studentId], references: [id])
   timetableId String?  @db.VarChar(191)
   timetable   Timetable? @relation(fields: [timetableId], references: [id])
+  timeSlot    String?  @db.VarChar(100)
 }
 
 model Timetable {
