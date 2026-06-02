@@ -184,14 +184,14 @@ export default function LibraryPage() {
                         {res.size && <p className="text-[10px] text-muted-foreground">{res.size}</p>}
                       </div>
                       <div className="flex gap-1">
-                        <a href={res.fileUrl} target="_blank" rel="noreferrer">
+                        <a href={res.fileUrl?.startsWith('/') ? `${API}${res.fileUrl}` : res.fileUrl} target="_blank" rel="noreferrer">
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-foreground hover:text-background transition-all">
-                            <Eye className="w-30.5 h-30.5" />
+                            <Eye className="w-4 h-4" />
                           </Button>
                         </a>
-                        <a href={res.fileUrl} download>
+                        <a href={res.fileUrl?.startsWith('/') ? `${API}${res.fileUrl}` : res.fileUrl} download>
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:bg-foreground hover:text-background transition-all">
-                            <Download className="w-30.5 h-30.5" />
+                            <Download className="w-4 h-4" />
                           </Button>
                         </a>
                         {canUpload && (

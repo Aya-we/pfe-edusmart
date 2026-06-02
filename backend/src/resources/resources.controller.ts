@@ -44,7 +44,7 @@ export class ResourcesController {
     return this.resourcesService.create({
       title:     body.title || file.originalname,
       type,
-      fileUrl:   `http://localhost:4000/uploads/resources/${file.filename}`,
+      fileUrl:   `/uploads/resources/${file.filename}`,
       size:      `${(file.size / 1024 / 1024).toFixed(1)} MB`,
       subjectId: body.subjectId || undefined,
       classId:   body.classId   || undefined,

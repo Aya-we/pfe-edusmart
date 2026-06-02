@@ -30,10 +30,30 @@ export class ResourcesService {
     size?: string;
     subjectId?: string;
     classId?: string;
-    teacherId?: string;
+    teacherId?: string; // This is actually userId from the frontend
   }) {
+    let actualTeacherId = undefined;
+    
+    // Si on a un teacherId (qui est en fait le userId), on cherche le vrai Teacher
+    if (data.teacherId) {
+      const teacher = await this.prisma.teacher.findUnique({
+        where: { userId: data.teacherId }
+      });
+      if (teacher) {
+        actualTeacherId = teacher.id;
+      }
+    }
+
     return this.prisma.resource.create({
-      data
+      data: {
+        title: data.title,
+        type: data.type,
+        fileUrl: data.fileUrl,
+        size: data.size,
+        subjectId: data.subjectId || null,
+        classId: data.classId || null,
+        teacherId: actualTeacherId
+      }
     });
   }
 
