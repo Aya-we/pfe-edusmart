@@ -11,7 +11,7 @@ export class UsersService {
       include: {
         student: {
           include: {
-            class: true,
+            // class: true, // Temporarily disabled due to corrupted classId 'no-class' causing Prisma crash
             parent: { include: { user: true } },
           },
         },
