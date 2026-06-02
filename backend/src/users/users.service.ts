@@ -74,29 +74,47 @@ export class UsersService {
         studentUpdate.parentId = parentId || null;
       }
       if (Object.keys(studentUpdate).length > 0) {
-        await this.prisma.student.update({
+        await this.prisma.student.upsert({
           where: { userId: id },
-          data: studentUpdate,
+          update: studentUpdate,
+          create: {
+            userId: id,
+            classId: classId || 'no-class',
+            parentId: parentId || null
+          }
         });
       }
     }
 
     // 3. Update Teacher Classes
     if (user.role === 'TEACHER' && teacherClasses) {
-      await this.prisma.teacher.update({
+      await this.prisma.teacher.upsert({
         where: { userId: id },
-        data: {
+        update: {
           teacherClasses: {
             deleteMany: {},
             create: teacherClasses.map((cid: string) => ({ classId: cid })),
           },
         },
+        create: {
+          userId: id,
+          teacherClasses: {
+            create: teacherClasses.map((cid: string) => ({ classId: cid })),
+          },
+        }
+      });
+    }
+    // 4. Update Parent
+    if (user.role === 'PARENT') {
+      await this.prisma.parent.upsert({
+        where: { userId: id },
+        update: {},
+        create: { userId: id }
       });
     }
 
     return user;
   }
-
   async delete(id: string) {
     // Delete profile first to avoid FK constraints if necessary (depending on schema)
     return this.prisma.user.delete({
