@@ -10,6 +10,7 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -21,6 +22,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const { user: currentUser } = useAuth();
   const [stats, setStats] = useState({
     students: 0, teachers: 0, classes: 0, parents: 0,
   });
@@ -32,8 +34,8 @@ export default function AdminDashboard() {
     const fetchAll = async () => {
       try {
         const [usersRes, classesRes] = await Promise.all([
-          axios.get(`${API}/users`),
-          axios.get(`${API}/classes`),
+          axios.get(`${API}/users?schoolId=${currentUser?.schoolId}`),
+          axios.get(`${API}/classes?schoolId=${currentUser?.schoolId}`),
         ]);
 
         const users   = usersRes.data  as any[];

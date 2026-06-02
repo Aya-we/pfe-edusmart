@@ -5,9 +5,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(role?: string) {
+  async findAll(role?: string, schoolId?: string) {
+    const whereClause: any = {};
+    if (role) whereClause.role = role as any;
+    if (schoolId) whereClause.schoolId = schoolId;
+    
     const users = await this.prisma.user.findMany({
-      where: role ? { role: role as any } : {},
+      where: whereClause,
       include: {
         student: {
           include: {

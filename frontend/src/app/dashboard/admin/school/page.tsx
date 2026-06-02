@@ -38,8 +38,8 @@ export default function SchoolManagementPage() {
     try {
       setLoading(true);
       const [resClasses, resSubjects] = await Promise.all([
-        axios.get(`${API}/classes`),
-        axios.get(`${API}/subjects`)
+        axios.get(`${API}/classes?schoolId=${user?.schoolId}`),
+        axios.get(`${API}/subjects?schoolId=${user?.schoolId}`)
       ]);
       setClasses(resClasses.data);
       setSubjects(resSubjects.data);

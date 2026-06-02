@@ -6,9 +6,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async findAll(@Query('role') role?: string) {
+  async findAll(@Query('role') role?: string, @Query('schoolId') schoolId?: string) {
     try {
-      return await this.usersService.findAll(role);
+      return await this.usersService.findAll(role, schoolId);
     } catch (e: any) {
       return { error: String(e), stack: e.stack };
     }

@@ -28,7 +28,7 @@ export default function MessagesPage() {
     try {
       const [convRes, usersRes] = await Promise.all([
         axios.get(`${API}/messages/conversations/${user.id}`),
-        axios.get(`${API}/users`),
+        axios.get(`${API}/users?schoolId=${user?.schoolId}`),
       ]);
       setContacts(convRes.data);
       setAllUsers(usersRes.data.filter((u: any) => u.id !== user.id));

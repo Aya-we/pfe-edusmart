@@ -44,7 +44,7 @@ export default function UsersManagementPage() {
       // Fetch classes
       let cData: any[] = [];
       try {
-        const cRes = await axios.get(`${API}/classes`);
+        const cRes = await axios.get(`${API}/classes?schoolId=${currentUser?.schoolId}`);
         cData = cRes.data;
         setClasses(cData);
         if (cData.length && !formData.classId) {
@@ -56,7 +56,7 @@ export default function UsersManagementPage() {
 
       // Fetch users
       try {
-        const uRes = await axios.get(`${API}/users`);
+        const uRes = await axios.get(`${API}/users?schoolId=${currentUser?.schoolId}`);
         setUsers(uRes.data);
         setParents(uRes.data.filter((u: any) => u.role === "PARENT"));
       } catch (err) {

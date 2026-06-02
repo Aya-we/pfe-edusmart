@@ -6,8 +6,8 @@ export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @Get()
-  findAll() {
-    return this.subjectsService.findAll();
+  findAll(@Query('schoolId') schoolId?: string) {
+    return this.subjectsService.findAll(schoolId);
   }
 
   @Post()

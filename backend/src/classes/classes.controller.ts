@@ -6,8 +6,8 @@ export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
   
   @Get()
-  findAll() {
-    return this.classesService.findAll();
+  findAll(@Query('schoolId') schoolId?: string) {
+    return this.classesService.findAll(schoolId);
   }
 
   @Get('teacher/:teacherId')

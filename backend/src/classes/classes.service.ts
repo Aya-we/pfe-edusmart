@@ -5,8 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ClassesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(schoolId?: string) {
     return this.prisma.class.findMany({
+      where: schoolId ? { schoolId } : {},
       include: {
         _count: {
           select: { students: true }

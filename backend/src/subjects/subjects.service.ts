@@ -5,8 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SubjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(schoolId?: string) {
     return this.prisma.subject.findMany({
+      where: schoolId ? { schoolId } : {},
       orderBy: { name: 'asc' }
     });
   }
