@@ -32,7 +32,35 @@ import { useAuth } from "@/context/AuthContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const DAYS = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+// Créneaux horaires fixes demandés
+const TIME_SLOTS = [
+  "08:00 - 09:00",
+  "09:00 - 10:00",
+  "10:00 - 11:00",
+  "11:00 - 12:00",
+  "14:00 - 15:00",
+  "15:00 - 16:00",
+  "16:00 - 17:00",
+  "17:00 - 18:00"
+];
+
+const STATUS_COLORS: Record<string, string> = {
+  "PRESENT": "bg-emerald-500/10 text-emerald-600 font-bold",
+  "ABSENT":  "bg-red-500/10 text-red-600 font-bold",
+  "LATE":    "bg-amber-500/10 text-amber-600 font-bold",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  "PRESENT": "P",
+  "ABSENT":  "A",
+  "LATE":    "R",
+};
+
+const NEXT_STATUS: Record<string, string> = {
+  "PRESENT": "ABSENT",
+  "ABSENT":  "LATE",
+  "LATE":    "PRESENT"
+};
 
 export default function AttendancePage() {
   const { user } = useAuth();
@@ -42,8 +70,6 @@ export default function AttendancePage() {
   const [selectedClassId, setSelectedClassId] = useState<string>("");
   const [students, setStudents] = useState<any[]>([]);
   
-  // Nouveaux états pour le timetable
-  const [timetables, setTimetables] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -68,26 +94,10 @@ export default function AttendancePage() {
       if (!selectedClassId || !user) return;
       setLoading(true);
       try {
-        // 1. Fetch timetable for the teacher
-        const timetableRes = await axios.get(`${API}/timetable/teacher/${user.id}`);
-        // Filtrer pour le jour sélectionné et la classe sélectionnée
-        const selectedDate = new Date(date);
-        const dayString = DAYS[selectedDate.getDay()];
-        
-        const dayTimetables = timetableRes.data
-          .filter((t: any) => t.day === dayString && t.classId === selectedClassId)
-          .sort((a: any, b: any) => a.startTime.localeCompare(b.startTime));
-          
-        setTimetables(dayTimetables);
-
-        // 2. Fetch students and their attendances for the date
         const response = await axios.get(`${API}/attendance/class/${selectedClassId}?date=${new Date(date).toISOString()}`);
         
-        // Formater les étudiants
         setStudents(response.data.map((s: any) => {
-          // Transformer le tableau d'absences en un dictionnaire { timetableId: status }
           const attendanceMap: Record<string, string> = {};
-          
           if (s.attendances && Array.isArray(s.attendances)) {
             s.attendances.forEach((att: any) => {
               if (att.timetableId) {
@@ -95,11 +105,7 @@ export default function AttendancePage() {
               }
             });
           }
-          
-          return {
-            ...s,
-            attendanceMap // { "timetableId1": "PRESENT", "timetableId2": "ABSENT" }
-          };
+          return { ...s, attendanceMap };
         }));
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -110,14 +116,15 @@ export default function AttendancePage() {
     fetchDataForDate();
   }, [selectedClassId, date, user]);
 
-  const handleStatusChange = (studentId: string, timetableId: string, newStatus: string) => {
+  const toggleStatus = (studentId: string, slot: string) => {
     setStudents(prev => prev.map(s => {
       if (s.studentId === studentId) {
+        const current = s.attendanceMap[slot] || "PRESENT";
         return {
           ...s,
           attendanceMap: {
             ...s.attendanceMap,
-            [timetableId]: newStatus
+            [slot]: NEXT_STATUS[current]
           }
         };
       }
@@ -125,29 +132,39 @@ export default function AttendancePage() {
     }));
   };
 
-  const handleSave = async (timetableId: string) => {
+  const handleSaveAll = async () => {
     setIsSaving(true);
     try {
-      // Filtrer les étudiants qui ont un statut défini pour cette séance
-      const recordsToSave = students
-        .filter(s => s.attendanceMap[timetableId])
-        .map(s => ({
+      // On va envoyer toutes les séances modifiées
+      // Pour éviter de faire trop de requêtes, on boucle sur les créneaux et on sauvegarde ceux qui ont des données
+      
+      const promises = TIME_SLOTS.map(slot => {
+        const recordsToSave = students
+          .filter(s => s.attendanceMap[slot] && s.attendanceMap[slot] !== "PRESENT") // Optionnel: ne sauver que ABSENT/LATE pour optimiser
+          .map(s => ({
+            studentId: s.studentId,
+            status: s.attendanceMap[slot]
+          }));
+          
+        // Si aucun étudiant n'a d'absence/retard ou de changement explicite pour ce créneau, on peut quand même envoyer tous ceux qui sont marqués explicitement.
+        const allRecords = students.filter(s => s.attendanceMap[slot]).map(s => ({
           studentId: s.studentId,
-          status: s.attendanceMap[timetableId]
+          status: s.attendanceMap[slot]
         }));
-        
-      if (recordsToSave.length === 0) {
-        alert("Veuillez sélectionner au moins un statut avant de sauvegarder.");
-        setIsSaving(false);
-        return;
-      }
 
-      await axios.post(`${API}/attendance/bulk`, {
-        date: new Date(date).toISOString(),
-        classId: selectedClassId,
-        timetableId: timetableId,
-        records: recordsToSave
+        if (allRecords.length > 0) {
+          return axios.post(`${API}/attendance/bulk`, {
+            date: new Date(date).toISOString(),
+            classId: selectedClassId,
+            timetableId: slot, // On utilise le créneau "08:00 - 09:00" comme ID
+            records: allRecords
+          });
+        }
+        return Promise.resolve();
       });
+
+      await Promise.all(promises);
+      
       setTimeout(() => setIsSaving(false), 2000);
     } catch (error) {
       console.error("Error saving attendance:", error);
@@ -162,18 +179,26 @@ export default function AttendancePage() {
   );
 
   return (
-    <div className="space-y-10 max-w-7xl mx-auto pb-20">
+    <div className="space-y-10 max-w-[1400px] mx-auto pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">Faire l'appel</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">Tableau d'Appel</h1>
           <p className="text-muted-foreground mt-2 text-lg">
-            Gérez les absences par séance
+            Cliquez sur les cases pour changer le statut (P = Présent, A = Absent, R = Retard)
           </p>
         </div>
+        
+        <Button 
+          className="rounded-lg h-11 bg-foreground text-background hover:bg-foreground/90 transition-all px-8 gap-2 font-bold" 
+          onClick={handleSaveAll}
+          disabled={isSaving}
+        >
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Tout Enregistrer
+        </Button>
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        {/* Sélecteur de Classe */}
         <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-lg border border-border">
           <Users className="w-4 h-4 text-muted-foreground" />
           <Select value={selectedClassId} onValueChange={(val) => setSelectedClassId(val || "")}>
@@ -188,7 +213,6 @@ export default function AttendancePage() {
           </Select>
         </div>
 
-        {/* Sélecteur de Date */}
         <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-lg border border-border">
           <CalendarIcon className="w-4 h-4 text-muted-foreground" />
           <Input 
@@ -204,90 +228,51 @@ export default function AttendancePage() {
         <div className="h-40 flex items-center justify-center border border-dashed rounded-xl border-border">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
         </div>
-      ) : timetables.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-40 border border-dashed rounded-xl border-border gap-2 bg-muted/20">
-          <CalendarIcon className="w-8 h-8 text-muted-foreground/50" />
-          <p className="text-muted-foreground font-bold text-sm">
-            Vous n'avez aucune séance programmée pour cette classe le {DAYS[new Date(date).getDay()]}.
-          </p>
-        </div>
       ) : (
-        <div className="space-y-8">
-          {timetables.map((session) => (
-            <div key={session.id} className="border border-border rounded-xl overflow-hidden bg-background shadow-sm">
-              {/* Header de la séance */}
-              <div className="bg-muted/50 border-b border-border p-4 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-lg">{session.subject?.name || "Matière"}</h3>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    {session.startTime} - {session.endTime}
-                  </p>
-                </div>
-                <Button 
-                  className="rounded-lg h-9 bg-foreground text-background hover:bg-foreground/90 transition-all px-4 gap-2 text-xs font-bold" 
-                  onClick={() => handleSave(session.id)}
-                  disabled={isSaving}
-                >
-                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                  Enregistrer cette séance
-                </Button>
-              </div>
-
-              {/* Tableau d'appel de la séance */}
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-b border-border">
-                    <TableHead className="py-3 pl-6 font-bold text-foreground">Élève</TableHead>
-                    <TableHead className="text-center font-bold text-foreground">Statut Actuel</TableHead>
-                    <TableHead className="text-right pr-6 font-bold text-foreground">Modifier le statut</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {students.map((student) => {
-                    // Si on a pas encore coché, on met PRESENT par défaut visuellement
-                    const currentStatus = student.attendanceMap[session.id] || "PRESENT";
-                    
+        <div className="border border-border rounded-xl overflow-x-auto bg-background shadow-sm">
+          <Table className="min-w-[1000px]">
+            <TableHeader className="bg-muted/30">
+              <TableRow className="hover:bg-transparent border-b border-border">
+                <TableHead className="py-4 pl-6 font-bold text-foreground w-[250px] sticky left-0 bg-background/95 backdrop-blur z-10 border-r border-border">
+                  Élève
+                </TableHead>
+                {TIME_SLOTS.map(slot => (
+                  <TableHead key={slot} className="text-center font-bold text-foreground text-xs whitespace-nowrap">
+                    {slot.replace(" - ", "\n")}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {students.map((student) => (
+                <TableRow key={student.studentId} className="hover:bg-muted/10 transition-colors border-b border-border/50 h-14">
+                  <TableCell className="pl-6 sticky left-0 bg-background/95 backdrop-blur z-10 border-r border-border font-bold text-sm">
+                    {student.lastName} {student.firstName}
+                  </TableCell>
+                  
+                  {TIME_SLOTS.map(slot => {
+                    const status = student.attendanceMap[slot] || "PRESENT";
                     return (
-                      <TableRow key={student.studentId} className="hover:bg-muted/30 transition-all border-b border-border/50 last:border-0 h-16">
-                        <TableCell className="pl-6">
-                          <p className="text-sm font-bold">{student.lastName} {student.firstName}</p>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className={cn(
-                            "text-[10px] font-bold px-3 py-1 rounded border uppercase tracking-tighter",
-                            currentStatus === "PRESENT" ? "border-foreground bg-foreground text-background" : 
-                            currentStatus === "ABSENT" ? "border-destructive text-destructive" : "border-amber-500 text-amber-500 bg-amber-500/10"
-                          )}>
-                            {currentStatus}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right pr-6">
-                          <div className="flex items-center justify-end gap-1">
-                            {["PRESENT", "ABSENT", "LATE"].map((status) => (
-                              <Button 
-                                key={status}
-                                size="sm" 
-                                variant="ghost" 
-                                onClick={() => handleStatusChange(student.studentId, session.id, status)}
-                                className={cn(
-                                  "h-8 rounded-md px-3 text-xs font-bold", 
-                                  currentStatus === status 
-                                    ? "bg-foreground text-background hover:bg-foreground/90" 
-                                    : "text-muted-foreground hover:bg-muted"
-                                )}
-                              >
-                                {status === "LATE" ? "RETARD" : status}
-                              </Button>
-                            ))}
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                      <TableCell 
+                        key={slot} 
+                        className="text-center p-1"
+                      >
+                        <button
+                          onClick={() => toggleStatus(student.studentId, slot)}
+                          className={cn(
+                            "w-full h-10 rounded-md transition-all flex items-center justify-center cursor-pointer select-none border border-transparent hover:border-border",
+                            STATUS_COLORS[status]
+                          )}
+                        >
+                          {STATUS_LABELS[status]}
+                        </button>
+                      </TableCell>
                     );
                   })}
-                </TableBody>
-              </Table>
-            </div>
-          ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
@@ -300,7 +285,7 @@ export default function AttendancePage() {
             className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-foreground text-background px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 text-sm font-bold"
           >
             <CheckCircle2 className="w-4 h-4" />
-            Appel enregistré
+            Appel enregistré avec succès
           </motion.div>
         )}
       </AnimatePresence>
