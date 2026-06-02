@@ -14,7 +14,8 @@ import {
   BookOpen,
   X,
   Check,
-  Loader2
+  Loader2,
+  BookMarked
 } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
@@ -24,28 +25,36 @@ const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 export default function SchoolManagementPage() {
   const { user } = useAuth();
   const [classes, setClasses] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [newClassName, setNewClassName] = useState("");
+  const [modalType, setModalType] = useState<"class" | "subject">("class");
+  const [newItemName, setNewItemName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"classes" | "subjects">("classes");
 
-  const fetchClasses = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/classes`);
-      setClasses(response.data);
+      setLoading(true);
+      const [resClasses, resSubjects] = await Promise.all([
+        axios.get(`${API}/classes`),
+        axios.get(`${API}/subjects`)
+      ]);
+      setClasses(resClasses.data);
+      setSubjects(resSubjects.data);
     } catch (error) {
-      console.error("Error fetching classes:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchClasses();
+    fetchData();
   }, []);
 
-  const handleCreateClass = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!user?.schoolId) {
@@ -54,14 +63,21 @@ export default function SchoolManagementPage() {
     }
     setCreating(true);
     try {
-      await axios.post(`${API}/classes`, {
-        name: newClassName,
-        schoolId: user.schoolId
-      });
+      if (modalType === "class") {
+        await axios.post(`${API}/classes`, {
+          name: newItemName,
+          schoolId: user.schoolId
+        });
+      } else {
+        await axios.post(`${API}/subjects`, {
+          name: newItemName,
+          schoolId: user.schoolId
+        });
+      }
 
-      await fetchClasses();
+      await fetchData();
       setShowModal(false);
-      setNewClassName("");
+      setNewItemName("");
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erreur lors de la création.";
       setError(typeof msg === "string" ? msg : JSON.stringify(msg));
@@ -82,48 +98,79 @@ export default function SchoolManagementPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Classes & Matières</h1>
-          <p className="text-muted-foreground mt-2 text-lg">Données réelles issues de MySQL.</p>
+          <div className="flex gap-4 mt-6">
+            <button 
+              onClick={() => setActiveTab("classes")}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "classes" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            >
+              Classes
+            </button>
+            <button 
+              onClick={() => setActiveTab("subjects")}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "subjects" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            >
+              Matières
+            </button>
+          </div>
         </div>
 
         <Button 
-          onClick={() => setShowModal(true)}
+          onClick={() => { setModalType(activeTab === "classes" ? "class" : "subject"); setShowModal(true); }}
           className="rounded-lg h-10 bg-foreground text-background hover:bg-foreground/90 transition-all px-6 gap-2"
         >
           <Plus className="w-4 h-4" />
-          Nouvelle Classe
+          Nouvelle {activeTab === "classes" ? "Classe" : "Matière"}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {classes.length === 0 ? (
-          <p className="col-span-full text-center py-10 text-muted-foreground">Aucune classe trouvée.</p>
-        ) : (
-          classes.map((cls) => (
-            <Card key={cls.id} className="rounded-2xl border border-border bg-background hover:border-foreground transition-all duration-300 group shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="p-20.5 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
-                    <School className="w-5 h-5" />
+        {activeTab === "classes" && (
+          classes.length === 0 ? (
+            <p className="col-span-full text-center py-10 text-muted-foreground">Aucune classe trouvée.</p>
+          ) : (
+            classes.map((cls) => (
+              <Card key={cls.id} className="rounded-2xl border border-border bg-background hover:border-foreground transition-all duration-300 group shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-2 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                      <School className="w-5 h-5" />
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
-                </div>
-                
-                <h3 className="text-xl font-bold tracking-tight mb-4">{cls.name}</h3>
-                
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-10.5 font-medium">
-                    <Users className="w-4 h-4" />
-                    {cls._count?.students ?? cls.students?.length ?? 0} Élèves
+                  
+                  <h3 className="text-xl font-bold tracking-tight mb-4">{cls.name}</h3>
+                  
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1 font-medium">
+                      <Users className="w-4 h-4" />
+                      {cls._count?.students ?? cls.students?.length ?? 0} Élèves
+                    </div>
                   </div>
-                  <div className="w-1 h-1 rounded-full bg-border" />
-                  <div className="flex items-center gap-10.5 font-medium">
-                    <BookOpen className="w-4 h-4" />
-                    Actif
+                </CardContent>
+              </Card>
+            ))
+          )
+        )}
+        
+        {activeTab === "subjects" && (
+          subjects.length === 0 ? (
+            <p className="col-span-full text-center py-10 text-muted-foreground">Aucune matière trouvée.</p>
+          ) : (
+            subjects.map((sub) => (
+              <Card key={sub.id} className="rounded-2xl border border-border bg-background hover:border-foreground transition-all duration-300 group shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="p-2 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
+                      <BookMarked className="w-5 h-5" />
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
+                  
+                  <h3 className="text-xl font-bold tracking-tight mb-4">{sub.name}</h3>
+                </CardContent>
+              </Card>
+            ))
+          )
         )}
       </div>
 
@@ -131,18 +178,18 @@ export default function SchoolManagementPage() {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-background border border-border w-full max-w-sm rounded-2xl shadow-2xl p-8 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold">Nouvelle Classe</h3>
+              <h3 className="text-2xl font-bold">Nouvelle {modalType === "class" ? "Classe" : "Matière"}</h3>
               <Button variant="ghost" size="icon" onClick={() => setShowModal(false)}><X className="w-5 h-5" /></Button>
             </div>
 
-            <form onSubmit={handleCreateClass} className="space-y-4">
-              <div className="space-y-10.5">
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom de la classe</label>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom</label>
                 <Input 
                   required 
-                  placeholder="ex: 2ème BAC Physique 1"
-                  value={newClassName}
-                  onChange={(e) => setNewClassName(e.target.value)}
+                  placeholder={modalType === "class" ? "ex: 2ème BAC Physique 1" : "ex: Mathématiques"}
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
                   className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
                 />
               </div>
