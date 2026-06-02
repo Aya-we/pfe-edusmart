@@ -19,16 +19,20 @@ export class ClassesService {
     const teacher = await this.prisma.teacher.findUnique({
       where: { userId: teacherUserId },
       include: {
-        classes: {
+        teacherClasses: {
           include: {
-            _count: {
-              select: { students: true }
+            class: {
+              include: {
+                _count: {
+                  select: { students: true }
+                }
+              }
             }
           }
         }
       }
     });
-    return teacher?.classes || [];
+    return teacher?.teacherClasses.map((tc: any) => tc.class) || [];
   }
 
   async createClass(data: { name: string; schoolId: string }) {

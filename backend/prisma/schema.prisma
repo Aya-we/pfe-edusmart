@@ -57,8 +57,8 @@ model Teacher {
   id        String   @id @default(uuid()) @db.VarChar(100)
   userId    String   @unique @db.VarChar(100)
   user      User     @relation(fields: [userId], references: [id])
-  subjects  Subject[]
-  classes   Class[]
+  teacherSubjects TeacherSubject[]
+  teacherClasses  TeacherClass[]
   timetables Timetable[]
   resources  Resource[]
 }
@@ -88,7 +88,7 @@ model Class {
   schoolId  String   @db.VarChar(100)
   school    School   @relation(fields: [schoolId], references: [id])
   students  Student[]
-  teachers  Teacher[]
+  teacherClasses TeacherClass[]
   timetables Timetable[]
   exams     Exam[]
   homeworks Homework[]
@@ -100,7 +100,7 @@ model Subject {
   name      String   @db.VarChar(191)
   schoolId  String   @db.VarChar(100)
   school    School   @relation(fields: [schoolId], references: [id])
-  teachers  Teacher[]
+  teacherSubjects TeacherSubject[]
   grades    Grade[]
   timetables Timetable[]
   exams     Exam[]
@@ -187,4 +187,24 @@ model Resource {
   teacherId   String?
   teacher     Teacher? @relation(fields: [teacherId], references: [id])
   createdAt   DateTime @default(now())
+}
+
+model TeacherClass {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  teacherId String   @db.VarChar(100)
+  classId   String   @db.VarChar(100)
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, classId])
+}
+
+model TeacherSubject {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  teacherId String   @db.VarChar(100)
+  subjectId String   @db.VarChar(100)
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, subjectId])
 }

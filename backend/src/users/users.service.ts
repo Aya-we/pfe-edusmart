@@ -6,7 +6,7 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(role?: string) {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: role ? { role: role as any } : {},
       include: {
         student: {
@@ -15,14 +15,22 @@ export class UsersService {
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { classes: true } },
+        teacher: { include: { teacherClasses: { include: { class: true } } } },
         parent: true,
       },
+    });
+    
+    return users.map(user => {
+      if (user.teacher) {
+        (user.teacher as any).classes = (user.teacher as any).teacherClasses?.map((tc: any) => tc.class) || [];
+        delete (user.teacher as any).teacherClasses;
+      }
+      return user;
     });
   }
 
   async findOne(id: string) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
       include: {
         student: {
@@ -31,10 +39,17 @@ export class UsersService {
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { classes: true } },
+        teacher: { include: { teacherClasses: { include: { class: true } } } },
         parent: { include: { students: { include: { user: true, class: true } } } },
       },
     });
+    
+    if (user && user.teacher) {
+      (user.teacher as any).classes = (user.teacher as any).teacherClasses?.map((tc: any) => tc.class) || [];
+      delete (user.teacher as any).teacherClasses;
+    }
+    
+    return user;
   }
 
   async update(id: string, data: any) {
@@ -67,8 +82,9 @@ export class UsersService {
       await this.prisma.teacher.update({
         where: { userId: id },
         data: {
-          classes: {
-            set: teacherClasses.map((cid: string) => ({ id: cid })),
+          teacherClasses: {
+            deleteMany: {},
+            create: teacherClasses.map((cid: string) => ({ classId: cid })),
           },
         },
       });
