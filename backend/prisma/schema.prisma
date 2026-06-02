@@ -127,6 +127,8 @@ model Attendance {
   justification String? @db.Text
   studentId   String   @db.VarChar(100)
   student     Student  @relation(fields: [studentId], references: [id])
+  timetableId String?  @db.VarChar(191)
+  timetable   Timetable? @relation(fields: [timetableId], references: [id])
 }
 
 model Timetable {
@@ -141,6 +143,7 @@ model Timetable {
   teacherId String
   teacher   Teacher  @relation(fields: [teacherId], references: [id])
   createdAt DateTime @default(now())
+  attendances Attendance[]
 }
 
 model Message {
