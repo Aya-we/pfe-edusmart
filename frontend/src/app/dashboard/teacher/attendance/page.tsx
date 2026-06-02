@@ -32,7 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AttendancePage() {
   const [classes, setClasses] = useState<any[]>([]);
@@ -44,7 +44,7 @@ export default function AttendancePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classesRes = await axios.get("${API}/classes");
+        const classesRes = await axios.get(`${API}/classes`);
         setClasses(classesRes.data);
         if (classesRes.data.length > 0) {
           setSelectedClassId(classesRes.data[0].id);
@@ -84,7 +84,7 @@ export default function AttendancePage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await axios.post("${API}/attendance/bulk", {
+      await axios.post(`${API}/attendance/bulk`, {
         date: new Date().toISOString(),
         classId: selectedClassId,
         records: students.map(s => ({

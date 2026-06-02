@@ -20,23 +20,25 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AdminSettingsPage() {
   const [school, setSchool] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSchool = async () => {
       try {
-        const response = await axios.get("${API}/schools");
+        const response = await axios.get(`${API}/schools`);
         if (response.data.length > 0) {
           setSchool(response.data[0]);
         }
       } catch (error) {
         console.error("Error fetching school:", error);
+        setError("Impossible de charger les données de l'école.");
       } finally {
         setLoading(false);
       }
@@ -47,12 +49,14 @@ export default function AdminSettingsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setError(null);
     try {
       await axios.put(`${API}/schools/${school.id}`, school);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (error) {
-      console.error("Error updating school:", error);
+    } catch (err: any) {
+      console.error("Error updating school:", err);
+      setError(err?.response?.data?.message || "Erreur lors de la sauvegarde. Veuillez réessayer.");
     } finally {
       setIsSaving(false);
     }

@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AdminAbsencesPage() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -31,7 +31,7 @@ export default function AdminAbsencesPage() {
 
   const fetchPending = async () => {
     try {
-      const response = await axios.get("${API}/attendance/pending");
+      const response = await axios.get(`${API}/attendance/pending`);
       setRequests(response.data);
     } catch (error) {
       console.error("Error fetching pending justifications:", error);

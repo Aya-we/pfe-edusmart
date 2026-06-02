@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function MessagesPage() {
   const { user } = useAuth();

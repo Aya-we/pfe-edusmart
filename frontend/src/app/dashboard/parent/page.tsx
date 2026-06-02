@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface ChildData {
   id: string;

@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const ROLE_LABELS: Record<string, string> = {
   STUDENT: "Étudiant",

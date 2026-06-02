@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 import { useAuth } from "@/context/AuthContext";
 
 export default function StudentAttendancePage() {

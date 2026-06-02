@@ -17,18 +17,22 @@ import {
   Loader2
 } from "lucide-react";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "${API}";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function SchoolManagementPage() {
+  const { user } = useAuth();
   const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newClassName, setNewClassName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get("${API}/classes");
+      const response = await axios.get(`${API}/classes`);
       setClasses(response.data);
     } catch (error) {
       console.error("Error fetching classes:", error);
@@ -43,21 +47,27 @@ export default function SchoolManagementPage() {
 
   const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    if (!user?.schoolId) {
+      setError("Session expirée, reconnectez-vous.");
+      return;
+    }
+    setCreating(true);
     try {
-      // En vrai on récupère le schoolId du user connecté
-      const schoolIdRes = await axios.get("${API}/users");
-      const schoolId = schoolIdRes.data[0].schoolId;
-
-      await axios.post("${API}/classes", {
+      await axios.post(`${API}/classes`, {
         name: newClassName,
-        schoolId: schoolId
+        schoolId: user.schoolId
       });
 
-      fetchClasses();
+      await fetchClasses();
       setShowModal(false);
       setNewClassName("");
-    } catch (error) {
-      console.error("Erreur creation classe:", error);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Erreur lors de la création.";
+      setError(typeof msg === "string" ? msg : JSON.stringify(msg));
+      console.error("Erreur creation classe:", err);
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -103,7 +113,7 @@ export default function SchoolManagementPage() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-10.5 font-medium">
                     <Users className="w-4 h-4" />
-                    {cls.students?.length || 0} Élèves
+                    {cls._count?.students ?? cls.students?.length ?? 0} Élèves
                   </div>
                   <div className="w-1 h-1 rounded-full bg-border" />
                   <div className="flex items-center gap-10.5 font-medium">
@@ -137,10 +147,16 @@ export default function SchoolManagementPage() {
                 />
               </div>
 
+              {error && (
+                <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  ⚠️ {error}
+                </p>
+              )}
+
               <div className="pt-4 flex gap-3">
-                <Button type="button" variant="outline" className="flex-1 rounded-lg h-11" onClick={() => setShowModal(false)}>Annuler</Button>
-                <Button type="submit" className="flex-1 rounded-lg h-11 bg-foreground text-background hover:bg-foreground/90 font-bold transition-all">
-                  Créer
+                <Button type="button" variant="outline" className="flex-1 rounded-lg h-11" onClick={() => { setShowModal(false); setError(null); }}>Annuler</Button>
+                <Button type="submit" disabled={creating} className="flex-1 rounded-lg h-11 bg-foreground text-background hover:bg-foreground/90 font-bold transition-all">
+                  {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Créer"}
                 </Button>
               </div>
             </form>
