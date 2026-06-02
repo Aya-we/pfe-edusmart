@@ -39,7 +39,11 @@ export default function MessagesPage() {
     }
   };
 
-  useEffect(() => { loadContacts(); }, [user]);
+  useEffect(() => { 
+    loadContacts(); 
+    const interval = setInterval(loadContacts, 5000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   /* ── 2. Charger messages quand on sélectionne un contact ── */
   useEffect(() => {
