@@ -40,15 +40,27 @@ export default function UsersManagementPage() {
   /* ─── Fetch all data ─── */
   const fetchData = async () => {
     try {
-      const [uRes, cRes] = await Promise.all([
-        axios.get(`${API}/users`),
-        axios.get(`${API}/classes`),
-      ]);
-      setUsers(uRes.data);
-      setClasses(cRes.data);
-      setParents(uRes.data.filter((u: any) => u.role === "PARENT"));
-      if (cRes.data.length && !formData.classId) {
-        setFormData(p => ({ ...p, classId: cRes.data[0].id }));
+      setLoading(true);
+      // Fetch classes
+      let cData: any[] = [];
+      try {
+        const cRes = await axios.get(`${API}/classes`);
+        cData = cRes.data;
+        setClasses(cData);
+        if (cData.length && !formData.classId) {
+          setFormData(p => ({ ...p, classId: cData[0].id }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch classes:", err);
+      }
+
+      // Fetch users
+      try {
+        const uRes = await axios.get(`${API}/users`);
+        setUsers(uRes.data);
+        setParents(uRes.data.filter((u: any) => u.role === "PARENT"));
+      } catch (err) {
+        console.error("Failed to fetch users:", err);
       }
     } catch (e) {
       console.error(e);
