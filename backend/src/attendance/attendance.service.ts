@@ -21,10 +21,19 @@ export class AttendanceService {
           }}
         });
         if (existing) {
-          return this.prisma.attendance.update({
+          const attendance = await this.prisma.attendance.update({
             where: { id: existing.id },
-            data: { status: record.status }
+            data: { status: record.status },
+            include: { student: { include: { user: true } } }
           });
+          
+          if (record.status === 'ABSENT') {
+            this.notificationsGateway.sendAbsenceNotification(
+              attendance.student.user.schoolId,
+              `${attendance.student.user.firstName} ${attendance.student.user.lastName}`
+            );
+          }
+          return attendance;
         }
       }
       

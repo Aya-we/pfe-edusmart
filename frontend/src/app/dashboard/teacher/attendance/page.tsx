@@ -139,28 +139,28 @@ export default function AttendancePage() {
       // Pour éviter de faire trop de requêtes, on boucle sur les créneaux et on sauvegarde ceux qui ont des données
       
       const promises = TIME_SLOTS.map(slot => {
-        const recordsToSave = students
-          .filter(s => s.attendanceMap[slot] && s.attendanceMap[slot] !== "PRESENT") // Optionnel: ne sauver que ABSENT/LATE pour optimiser
-          .map(s => ({
-            studentId: s.studentId,
-            status: s.attendanceMap[slot]
-          }));
-          
-        // Si aucun étudiant n'a d'absence/retard ou de changement explicite pour ce créneau, on peut quand même envoyer tous ceux qui sont marqués explicitement.
-        const allRecords = students.filter(s => s.attendanceMap[slot]).map(s => ({
+        // On récupère le statut de TOUS les étudiants pour ce créneau (par défaut PRESENT)
+        const allRecords = students.map(s => ({
           studentId: s.studentId,
-          status: s.attendanceMap[slot]
+          status: s.attendanceMap[slot] || "PRESENT"
         }));
 
-        if (allRecords.length > 0) {
-          return axios.post(`${API}/attendance/bulk`, {
-            date: new Date(date).toISOString(),
-            classId: selectedClassId,
-            timetableId: slot, // On utilise le créneau "08:00 - 09:00" comme ID
-            records: allRecords
-          });
-        }
-        return Promise.resolve();
+        // On vérifie s'il y a au moins UNE modification dans ce créneau par rapport au défaut
+        // OU si on veut forcer la sauvegarde de toute la grille, on envoie tout.
+        // Pour répondre au besoin "Tout enregistrer", on envoie tous les créneaux où au moins 
+        // un étudiant a été cliqué, OU BIEN on envoie vraiment toute la grille.
+        // Puisque le prof s'attend à ce que "Tout enregistrer" sauvegarde l'état visuel,
+        // on envoie tous les records pour ce slot s'il décide de sauvegarder.
+        // On sauvegarde systématiquement le créneau si le prof clique sur "Tout Enregistrer".
+        // Le prof s'attend à ce que l'état visuel entier (y compris les P par défaut) soit persisté
+        // pour qu'il puisse prouver qu'il a bien fait l'appel (même si tout le monde est présent).
+        
+        return axios.post(`${API}/attendance/bulk`, {
+          date: new Date(date).toISOString(),
+          classId: selectedClassId,
+          timetableId: slot,
+          records: allRecords
+        });
       });
 
       await Promise.all(promises);
