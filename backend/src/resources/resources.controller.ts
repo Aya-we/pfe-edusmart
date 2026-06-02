@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, UseInterceptors, UploadedFile, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, UseInterceptors, UploadedFile, Body, HttpException, HttpStatus, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ResourcesService } from './resources.service';
@@ -13,8 +13,8 @@ export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Get()
-  findAll() {
-    return this.resourcesService.findAll();
+  findAll(@Query('schoolId') schoolId?: string) {
+    return this.resourcesService.findAll(schoolId);
   }
 
   // ─── Upload fichier (PDF, vidéo, etc.) ──────────────────

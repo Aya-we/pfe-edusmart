@@ -42,9 +42,9 @@ export default function LibraryPage() {
   const fetchResources = async () => {
     try {
       const [rRes, cRes, sRes] = await Promise.all([
-        axios.get(`${API}/resources`),
-        axios.get(`${API}/classes`),
-        axios.get(`${API}/subjects`),
+        axios.get(`${API}/resources?schoolId=${user?.schoolId}`),
+        axios.get(`${API}/classes?schoolId=${user?.schoolId}`),
+        axios.get(`${API}/subjects?schoolId=${user?.schoolId}`),
       ]);
       setResources(rRes.data);
       setClasses(cRes.data);

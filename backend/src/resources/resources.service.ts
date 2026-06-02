@@ -5,8 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ResourcesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(schoolId?: string) {
     return this.prisma.resource.findMany({
+      where: schoolId ? {
+        OR: [
+          { subject: { schoolId } },
+          { class: { schoolId } },
+          { teacher: { user: { schoolId } } }
+        ]
+      } : {},
       include: {
         subject: true,
         class: true,
