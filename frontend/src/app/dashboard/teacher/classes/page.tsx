@@ -11,14 +11,39 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-const mockClasses = [
-  { id: "1", name: "2ème BAC PC 1", studentsCount: 32, subject: "Mathématiques" },
-  { id: "2", name: "2ème BAC PC 2", studentsCount: 28, subject: "Mathématiques" },
-  { id: "3", name: "1er BAC SM 1", studentsCount: 24, subject: "Algèbre" },
-  { id: "4", name: "Tronc Commun S 3", studentsCount: 35, subject: "Arithmétique" },
-];
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function MyClassesPage() {
+  const { user } = useAuth();
+  const [classes, setClasses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchClasses = async () => {
+      try {
+        const res = await axios.get(`${API}/classes/teacher/${user.id}`);
+        setClasses(res.data);
+      } catch (err) {
+        console.error("Failed to fetch classes", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClasses();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="w-8 h-8 animate-spin rounded-full border-4 border-muted-foreground border-t-transparent" />
+      </div>
+    );
+  }
   return (
     <div className="space-y-10 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
@@ -29,7 +54,11 @@ export default function MyClassesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mockClasses.map((cls, i) => (
+        {classes.length === 0 ? (
+          <div className="col-span-1 md:col-span-2 text-center text-muted-foreground py-12">
+            Aucune classe assignée.
+          </div>
+        ) : classes.map((cls, i) => (
           <div
             key={cls.id}
             className="group rounded-2xl border border-border bg-background p-8 hover:border-foreground transition-all duration-300 shadow-sm"
@@ -45,7 +74,7 @@ export default function MyClassesPage() {
                   <div className="w-1 h-1 rounded-full bg-border" />
                   <div className="flex items-center gap-1">
                     <Users className="w-30.5 h-30.5" />
-                    {cls.studentsCount} Élèves
+                    {cls._count?.students || 0} Élèves
                   </div>
                 </div>
               </div>
