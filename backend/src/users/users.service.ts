@@ -11,11 +11,11 @@ export class UsersService {
       include: {
         student: {
           include: {
-            // class: true, // Temporarily disabled due to corrupted classId 'no-class' causing Prisma crash
+            class: true,
             parent: { include: { user: true } },
           },
         },
-        teacher: true, // Temporary fix: removed { include: { classes: true } } because _ClassToTeacher table is missing on Render database
+        teacher: { include: { classes: true } },
         parent: true,
       },
     });
@@ -27,12 +27,12 @@ export class UsersService {
       include: {
         student: {
           include: {
-            // class: true,
+            class: true,
             parent: { include: { user: true } },
           },
         },
-        teacher: true, // { include: { classes: true } },
-        parent: { include: { students: { include: { user: true /*, class: true*/ } } } },
+        teacher: { include: { classes: true } },
+        parent: { include: { students: { include: { user: true, class: true } } } },
       },
     });
   }
@@ -64,8 +64,6 @@ export class UsersService {
 
     // 3. Update Teacher Classes
     if (user.role === 'TEACHER' && teacherClasses) {
-      // Temporarily disabled to prevent crash due to missing _ClassToTeacher table
-      /*
       await this.prisma.teacher.update({
         where: { userId: id },
         data: {
@@ -74,7 +72,6 @@ export class UsersService {
           },
         },
       });
-      */
     }
 
     return user;
