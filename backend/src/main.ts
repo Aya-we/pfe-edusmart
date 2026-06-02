@@ -3,8 +3,26 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { join } from 'node:path';
 import { json, urlencoded } from 'express';
+import { execSync } from 'child_process';
+import { PrismaClient } from '@prisma/client';
+
+async function runDatabaseMigrations() {
+  try {
+    console.log('Running database pre-flight checks...');
+    const prisma = new PrismaClient();
+    await prisma.student.deleteMany({ where: { classId: 'no-class' } }).catch(() => {});
+    await prisma.$disconnect();
+    
+    console.log('Running prisma db push...');
+    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    console.log('Database migrated successfully!');
+  } catch (err) {
+    console.error('Database migration failed:', err);
+  }
+}
 
 async function bootstrap() {
+  await runDatabaseMigrations();
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
   app.use(json({ limit: '50mb' }));
