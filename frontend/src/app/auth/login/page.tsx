@@ -90,7 +90,7 @@ export default function LoginPage() {
             </Button>
 
             <div className="text-center text-sm text-muted-foreground pt-2">
-              Pas encore de compte ? <Link href="#" className="text-primary font-medium hover:underline">Contactez votre école</Link>
+              Pas encore de compte ? <Link href="/auth/register" className="text-primary font-bold hover:underline">Créer votre école</Link>
             </div>
           </form>
         </div>

@@ -22,6 +22,20 @@ export class AuthService {
   async register(data: any) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     
+    let finalSchoolId = data.schoolId;
+
+    if (data.role === 'ADMIN' && data.schoolName) {
+      const baseSubdomain = data.schoolName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const subdomain = baseSubdomain + '-' + Math.floor(Math.random() * 10000);
+      const newSchool = await this.prisma.school.create({
+        data: {
+          name: data.schoolName,
+          subdomain: subdomain,
+        },
+      });
+      finalSchoolId = newSchool.id;
+    }
+
     // 1. Créer l'utilisateur de base
     let user;
     try {
@@ -32,7 +46,7 @@ export class AuthService {
           firstName: data.firstName,
           lastName: data.lastName,
           role: data.role,
-          schoolId: data.schoolId,
+          schoolId: finalSchoolId,
         },
       });
     } catch (error: any) {
