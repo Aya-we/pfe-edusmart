@@ -132,9 +132,10 @@ export default function UsersManagementPage() {
       }
       fetchData();
       closeModal();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erreur lors de l'opération.");
+      const msg = err?.response?.data?.message || "Erreur lors de l'opération.";
+      alert(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };
 

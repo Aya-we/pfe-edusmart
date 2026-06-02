@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -23,16 +23,24 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     
     // 1. Créer l'utilisateur de base
-    const user = await this.prisma.user.create({
-      data: {
-        email: data.email,
-        password: hashedPassword,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        schoolId: data.schoolId,
-      },
-    });
+    let user;
+    try {
+      user = await this.prisma.user.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: data.role,
+          schoolId: data.schoolId,
+        },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Cet email est déjà utilisé.');
+      }
+      throw error;
+    }
 
     // 2. Créer le profil spécifique selon le rôle
     if (data.role === 'TEACHER') {
