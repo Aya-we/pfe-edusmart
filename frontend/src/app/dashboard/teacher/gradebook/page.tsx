@@ -30,8 +30,8 @@ export default function GradebookPage() {
     const init = async () => {
       try {
         const [cRes, sRes] = await Promise.all([
-          axios.get(`${API}/classes`),
-          axios.get(`${API}/subjects`),
+          axios.get(`${API}/classes/teacher/${user?.id}`),
+          axios.get(`${API}/subjects?schoolId=${user?.schoolId}`),
         ]);
         setClasses(cRes.data);
         setSubjects(sRes.data);
@@ -100,14 +100,21 @@ export default function GradebookPage() {
       students.forEach(student => {
         student.grades.forEach((val: string, idx: number) => {
           if (val === "" || isNaN(Number.parseFloat(val))) return;
-          calls.push(
-            axios.post(`${API}/grades`, {
-              studentId:  student.id,
-              subjectId:  selectedSubjectId,
-              value:      Number.parseFloat(val),
-              type:       idx === 0 ? "CC1" : idx === 1 ? "CC2" : "EXAM",
-            })
-          );
+          
+          const existingId = student.gradeIds[idx];
+          const payload = {
+            studentId:  student.id,
+            subjectId:  selectedSubjectId,
+            value:      Number.parseFloat(val),
+            coefficient: 1,
+            comment:    idx === 0 ? "CC1" : idx === 1 ? "CC2" : "EXAM",
+          };
+
+          if (existingId) {
+            calls.push(axios.put(`${API}/grades/${existingId}`, payload));
+          } else {
+            calls.push(axios.post(`${API}/grades`, payload));
+          }
         });
       });
       await Promise.all(calls);

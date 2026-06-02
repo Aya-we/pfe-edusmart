@@ -32,9 +32,12 @@ import {
 import { cn } from "@/lib/utils";
 import axios from "axios";
 
+import { useAuth } from "@/context/AuthContext";
+
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AttendancePage() {
+  const { user } = useAuth();
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedClassId, setSelectedClassId] = useState<string>("");
   const [students, setStudents] = useState<any[]>([]);
@@ -44,7 +47,8 @@ export default function AttendancePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const classesRes = await axios.get(`${API}/classes`);
+        if (!user) return;
+        const classesRes = await axios.get(`${API}/classes/teacher/${user.id}`);
         setClasses(classesRes.data);
         if (classesRes.data.length > 0) {
           setSelectedClassId(classesRes.data[0].id);
@@ -56,7 +60,7 @@ export default function AttendancePage() {
       }
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const fetchStudents = async () => {
