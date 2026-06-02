@@ -14,7 +14,7 @@ async function runDatabaseMigrations() {
     await prisma.$disconnect();
     
     console.log('Running prisma db push...');
-    execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
+    execSync('npx -y prisma db push --accept-data-loss', { stdio: 'inherit' });
     console.log('Database migrated successfully!');
   } catch (err) {
     console.error('Database migration failed:', err);
