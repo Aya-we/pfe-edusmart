@@ -27,12 +27,12 @@ export class UsersService {
       include: {
         student: {
           include: {
-            class: true,
+            // class: true,
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { classes: true } },
-        parent: { include: { students: { include: { user: true, class: true } } } },
+        teacher: true, // { include: { classes: true } },
+        parent: { include: { students: { include: { user: true /*, class: true*/ } } } },
       },
     });
   }
@@ -64,6 +64,8 @@ export class UsersService {
 
     // 3. Update Teacher Classes
     if (user.role === 'TEACHER' && teacherClasses) {
+      // Temporarily disabled to prevent crash due to missing _ClassToTeacher table
+      /*
       await this.prisma.teacher.update({
         where: { userId: id },
         data: {
@@ -72,6 +74,7 @@ export class UsersService {
           },
         },
       });
+      */
     }
 
     return user;
