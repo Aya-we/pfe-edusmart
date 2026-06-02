@@ -6,8 +6,12 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll(@Query('role') role?: string) {
-    return this.usersService.findAll(role);
+  async findAll(@Query('role') role?: string) {
+    try {
+      return await this.usersService.findAll(role);
+    } catch (e: any) {
+      return { error: String(e), stack: e.stack };
+    }
   }
 
   @Get(':id')
