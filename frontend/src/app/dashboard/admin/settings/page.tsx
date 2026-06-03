@@ -19,10 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AdminSettingsPage() {
+  const { user } = useAuth();
   const [school, setSchool] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -31,11 +33,10 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     const fetchSchool = async () => {
+      if (!user?.schoolId) return;
       try {
-        const response = await axios.get(`${API}/schools`);
-        if (response.data.length > 0) {
-          setSchool(response.data[0]);
-        }
+        const response = await axios.get(`${API}/schools/${user.schoolId}`);
+        setSchool(response.data);
       } catch (error) {
         console.error("Error fetching school:", error);
         setError("Impossible de charger les données de l'école.");
@@ -44,7 +45,7 @@ export default function AdminSettingsPage() {
       }
     };
     fetchSchool();
-  }, []);
+  }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
