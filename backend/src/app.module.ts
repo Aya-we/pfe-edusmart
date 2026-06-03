@@ -16,8 +16,15 @@ import { UsersModule } from './users/users.module';
 import { TimetableUploadModule } from './timetable-upload/timetable-upload.module';
 import { MessagesModule } from './messages/messages.module';
 
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
     PrismaModule,
     AuthModule,
     GradesModule,

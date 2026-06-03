@@ -22,16 +22,19 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export default function AdminAbsencesPage() {
+  const { user } = useAuth();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchPending = async () => {
+    if (!user?.schoolId) return;
     try {
-      const response = await axios.get(`${API}/attendance/pending`);
+      const response = await axios.get(`${API}/attendance/pending?schoolId=${user.schoolId}`);
       setRequests(response.data);
     } catch (error) {
       console.error("Error fetching pending justifications:", error);
@@ -42,7 +45,7 @@ export default function AdminAbsencesPage() {
 
   useEffect(() => {
     fetchPending();
-  }, []);
+  }, [user]);
 
   const handleAction = async (id: string, action: 'approve' | 'reject') => {
     try {
@@ -110,7 +113,7 @@ export default function AdminAbsencesPage() {
                       variant="ghost" 
                       size="sm" 
                       className="h-8 rounded-lg border border-border gap-2 text-[10px] font-bold uppercase tracking-widest hover:bg-foreground hover:text-background transition-all"
-                      onClick={() => globalThis.open(item.justification, '_blank')}
+                      onClick={() => globalThis.open(`${API}${item.justification}`, '_blank')}
                     >
                       <Eye className="w-30.5 h-30.5" />
                       Voir le fichier

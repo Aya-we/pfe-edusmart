@@ -108,13 +108,17 @@ export class AttendanceService {
     });
   }
 
-  async getPendingJustifications() {
+  async getPendingJustifications(schoolId?: string) {
+    const whereClause: any = {
+      status: 'ABSENT',
+      justified: false,
+      justification: { not: null }
+    };
+    if (schoolId) {
+      whereClause.student = { user: { schoolId } };
+    }
     return this.prisma.attendance.findMany({
-      where: { 
-        status: 'ABSENT',
-        justified: false,
-        justification: { not: null }
-      },
+      where: whereClause,
       include: {
         student: {
           include: {

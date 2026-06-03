@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, Param, Query, Put, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Put, HttpException, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
+const UPLOAD_DIR = path.join(process.cwd(), 'uploads', 'justifications');
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 import { AttendanceService } from './attendance.service';
 
 @Controller('attendance')
@@ -29,13 +36,27 @@ export class AttendanceController {
   }
 
   @Post(':id/submit-justification')
-  submitJustification(@Param('id') id: string, @Body() data: { fileUrl: string }) {
-    return this.attendanceService.submitJustification(id, data.fileUrl);
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: require('node:path').join(process.cwd(), 'uploads', 'justifications'),
+      filename: (req, file, cb) => {
+        const ext = require('node:path').extname(file.originalname);
+        const name = require('node:path').basename(file.originalname, ext).replaceAll(/\\s+/g, '_');
+        cb(null, `${name}_${Date.now()}${ext}`);
+      },
+    }),
+  }))
+  submitJustification(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new HttpException('Aucun fichier fourni', HttpStatus.BAD_REQUEST);
+    }
+    const fileUrl = `/uploads/justifications/${file.filename}`;
+    return this.attendanceService.submitJustification(id, fileUrl);
   }
 
   @Get('pending')
-  getPending() {
-    return this.attendanceService.getPendingJustifications();
+  getPending(@Query('schoolId') schoolId: string) {
+    return this.attendanceService.getPendingJustifications(schoolId);
   }
 
   @Put(':id/approve')

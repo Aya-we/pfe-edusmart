@@ -45,11 +45,13 @@ export default function StudentAttendancePage() {
     fetchAttendance();
   }, [user]);
 
-  const handleJustify = async (id: string) => {
-    // Simulation d'upload pour le moment, mais l'API est là
-    const fileUrl = "certificat_medical.jpg"; 
+  const handleJustify = async (id: string, file: File) => {
     try {
-      await axios.post(`${API}/attendance/${id}/submit-justification`, { fileUrl });
+      const formData = new FormData();
+      formData.append('file', file);
+      await axios.post(`${API}/attendance/${id}/submit-justification`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       alert("Demande de justification envoyée !");
       // Re-fetch data
       const response = await axios.get(`${API}/attendance/student/${user?.id}`);
@@ -128,14 +130,24 @@ export default function StudentAttendancePage() {
                         ) : absence.justification ? (
                           <span className="text-orange-500 text-[10px] font-black uppercase italic">En cours de validation...</span>
                         ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="h-7 text-[9px] font-bold uppercase tracking-widest border-foreground hover:bg-foreground hover:text-background transition-all"
-                            onClick={() => handleJustify(absence.id)}
-                          >
-                            Justifier (Upload)
-                          </Button>
+                          <div className="relative overflow-hidden inline-block">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-7 text-[9px] font-bold uppercase tracking-widest border-foreground hover:bg-foreground hover:text-background transition-all"
+                            >
+                              Justifier (Upload)
+                            </Button>
+                            <input 
+                              type="file" 
+                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              onChange={(e) => {
+                                if (e.target.files?.[0]) {
+                                  handleJustify(absence.id, e.target.files[0]);
+                                }
+                              }}
+                            />
+                          </div>
                         )}
                       </div>
                     )}
