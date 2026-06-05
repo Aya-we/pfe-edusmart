@@ -49,19 +49,31 @@ export class GradesService {
     const subjectGrades = grades.reduce((acc, grade) => {
       if (!acc[grade.subjectId]) {
         acc[grade.subjectId] = {
+          id: grade.subjectId,
           name: grade.subject.name,
           sum: 0,
           totalCoeff: 0,
+          grades: [],
         };
       }
       acc[grade.subjectId].sum += grade.value * grade.coefficient;
       acc[grade.subjectId].totalCoeff += grade.coefficient;
+      acc[grade.subjectId].grades.push({
+        value: grade.value,
+        coefficient: grade.coefficient,
+        comment: grade.comment || `Note ${acc[grade.subjectId].grades.length + 1}`,
+        date: grade.date,
+      });
       return acc;
     }, {} as any);
 
     return Object.values(subjectGrades).map((s: any) => ({
+      subjectId: s.id,
       subject: s.name,
+      grades: s.grades,
       average: s.totalCoeff > 0 ? (s.sum / s.totalCoeff).toFixed(2) : 0,
+      totalCoeff: s.totalCoeff,
+      sum: s.sum,
     }));
   }
 
