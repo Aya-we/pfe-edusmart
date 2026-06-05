@@ -22,13 +22,13 @@ export default function StudentSchedulePage() {
 
   useEffect(() => {
     const fetchSchedule = async () => {
-      if (!token || !user?.classId) return;
+      if (!token) return;
       try {
         const headers = { Authorization: `Bearer ${token}` };
         const [schRes, absRes, exmRes] = await Promise.all([
           axios.get(`${API}/timetable/mine?userId=${user?.id}&role=${user?.role}&period=${period}`, { headers }),
           axios.get(`${API}/absences?schoolId=${user?.schoolId}`, { headers }),
-          axios.get(`${API}/exams/class/${user?.classId}`, { headers })
+          axios.get(`${API}/exams/class/${(user as any)?.student?.classId || (user as any)?.classId || 'none'}`, { headers })
         ]);
         setSchedule(schRes.data);
         setAbsences(absRes.data);
