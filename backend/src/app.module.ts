@@ -18,6 +18,7 @@ import { MessagesModule } from './messages/messages.module';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { join } from 'path';
     UsersModule,
     TimetableUploadModule,
     MessagesModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

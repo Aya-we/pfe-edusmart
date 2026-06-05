@@ -5,17 +5,39 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TimetableService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getStudentByUserId(userId: string) {
+    return this.prisma.student.findUnique({
+      where: { userId }
+    });
+  }
+
   async getByClass(classId: string) {
     return this.prisma.timetable.findMany({
       where: { classId },
       include: {
         subject: true,
         teacher: { include: { user: true } },
+        room: true,
       },
       orderBy: [
         { day: 'asc' },
         { startTime: 'asc' },
       ],
+    });
+  }
+
+  async getAllForSchool(schoolId: string) {
+    const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
+    const classIds = classes.map(c => c.id);
+
+    return this.prisma.timetable.findMany({
+      where: { classId: { in: classIds } },
+      include: {
+        subject: true,
+        teacher: { include: { user: true } },
+        room: true,
+        class: true
+      }
     });
   }
 
@@ -31,12 +53,31 @@ export class TimetableService {
       include: {
         subject: true,
         class: true,
+        room: true,
       },
       orderBy: [
         { day: 'asc' },
         { startTime: 'asc' },
       ],
     });
+  }
+
+  async saveBulk(schoolId: string, entries: any[]) {
+    const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
+    const classIds = classes.map(c => c.id);
+
+    // Delete existing
+    await this.prisma.timetable.deleteMany({
+      where: { classId: { in: classIds } }
+    });
+
+    // Insert new
+    if (entries.length > 0) {
+      await this.prisma.timetable.createMany({
+        data: entries
+      });
+    }
+    return { success: true, count: entries.length };
   }
 
   async createSlot(data: { 

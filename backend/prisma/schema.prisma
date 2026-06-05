@@ -32,6 +32,7 @@ model School {
   users       User[]
   classes     Class[]
   subjects    Subject[]
+  rooms       Room[]
 }
 
 model User {
@@ -108,6 +109,14 @@ model Subject {
   resources Resource[]
 }
 
+model Room {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  name      String   @db.VarChar(191)
+  schoolId  String   @db.VarChar(100)
+  school    School   @relation(fields: [schoolId], references: [id])
+  timetables Timetable[]
+}
+
 model Grade {
   id          String   @id @default(uuid()) @db.VarChar(100)
   value       Float
@@ -144,6 +153,8 @@ model Timetable {
   subject   Subject  @relation(fields: [subjectId], references: [id])
   teacherId String
   teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  roomId    String?
+  room      Room?    @relation(fields: [roomId], references: [id])
   createdAt DateTime @default(now())
   attendances Attendance[]
 }
