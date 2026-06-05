@@ -16,23 +16,25 @@ export default function StudentSchedulePage() {
   const { user, token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [schedule, setSchedule] = useState<any[]>([]);
-  const [absences, setAbsences] = useState<any[]>([]);
   const [exams, setExams] = useState<any[]>([]);
   const [period, setPeriod] = useState("Standard");
+  const [availablePeriods, setAvailablePeriods] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchSchedule = async () => {
       if (!token) return;
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [schRes, absRes, exmRes] = await Promise.all([
+        const [schRes, absRes, exmRes, periodsRes] = await Promise.all([
           axios.get(`${API}/timetable/mine?userId=${user?.id}&role=${user?.role}&period=${period}`, { headers }),
           axios.get(`${API}/absences?schoolId=${user?.schoolId}`, { headers }),
-          axios.get(`${API}/exams/class/${(user as any)?.student?.classId || (user as any)?.classId || 'none'}`, { headers })
+          axios.get(`${API}/exams/class/${(user as any)?.student?.classId || (user as any)?.classId || 'none'}`, { headers }),
+          axios.get(`${API}/timetable/periods?schoolId=${user?.schoolId}`, { headers })
         ]);
         setSchedule(schRes.data);
         setAbsences(absRes.data);
         setExams(exmRes.data);
+        setAvailablePeriods(periodsRes.data);
       } catch (e) {
         console.error(e);
       } finally {
@@ -81,17 +83,26 @@ export default function StudentSchedulePage() {
             <Calendar className="w-4 h-4" /> Semaine du {weekLabel().label}
           </p>
         </div>
-        <select 
-          value={period} 
-          onChange={(e) => setPeriod(e.target.value)}
-          className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-        >
-          <option value="Standard">Période : Standard</option>
-          <option value="Semestre 1">Période : Semestre 1</option>
-          <option value="Semestre 2">Période : Semestre 2</option>
-          <option value="Ramadan">Période : Ramadan</option>
-          <option value="Été">Période : Été</option>
-        </select>
+        <div className="flex gap-2">
+          <input 
+            type="text"
+            list="period-options"
+            placeholder="Période..."
+            value={period} 
+            onChange={(e) => setPeriod(e.target.value)}
+            className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+          />
+          <datalist id="period-options">
+            {availablePeriods.map(p => (
+              <option key={p} value={p} />
+            ))}
+            {!availablePeriods.includes("Standard") && <option value="Standard" />}
+            <option value="Semestre 1" />
+            <option value="Semestre 2" />
+            <option value="Ramadan" />
+            <option value="Été" />
+          </datalist>
+        </div>
       </div>
 
       {exams.length > 0 && (

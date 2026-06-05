@@ -10,6 +10,11 @@ export class TimetableController {
     return this.timetableService.getAllForSchool(schoolId, period);
   }
 
+  @Get('periods')
+  getPeriods(@Query('schoolId') schoolId: string) {
+    return this.timetableService.getPeriods(schoolId);
+  }
+
   @Get('mine')
   async getMine(@Query('userId') userId: string, @Query('role') role: string, @Query('period') period: string = 'Standard') {
     if (role === 'TEACHER') {

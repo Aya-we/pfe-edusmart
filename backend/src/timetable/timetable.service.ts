@@ -41,6 +41,18 @@ export class TimetableService {
     });
   }
 
+  async getPeriods(schoolId: string) {
+    const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
+    const classIds = classes.map(c => c.id);
+    
+    const timetables = await this.prisma.timetable.findMany({
+      where: { classId: { in: classIds } },
+      select: { period: true },
+      distinct: ['period']
+    });
+    return timetables.map(t => t.period);
+  }
+
   async getByTeacher(teacherUserId: string, period: string) {
     const teacher = await this.prisma.teacher.findUnique({
       where: { userId: teacherUserId }

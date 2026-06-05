@@ -25,6 +25,7 @@ export default function AdminSchedulePage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [period, setPeriod] = useState("Standard");
+  const [availablePeriods, setAvailablePeriods] = useState<string[]>([]);
 
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -39,16 +40,19 @@ export default function AdminSchedulePage() {
       if (!user?.schoolId || !token) return;
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [clsRes, subRes, tchRes, roomRes, ttRes] = await Promise.all([
+        const [clsRes, subRes, tchRes, roomRes, ttRes, periodsRes] = await Promise.all([
           axios.get(`${API}/classes?schoolId=${user.schoolId}`),
           axios.get(`${API}/subjects?schoolId=${user.schoolId}`),
           axios.get(`${API}/users?role=TEACHER&schoolId=${user.schoolId}`, { headers }),
           axios.get(`${API}/rooms?schoolId=${user.schoolId}`, { headers }),
-          axios.get(`${API}/timetable/all?schoolId=${user.schoolId}&period=${period}`, { headers })
+          axios.get(`${API}/timetable/all?schoolId=${user.schoolId}&period=${period}`, { headers }),
+          axios.get(`${API}/timetable/periods?schoolId=${user.schoolId}`, { headers })
         ]);
 
         setClasses(clsRes.data);
         setSubjects(subRes.data);
+        setRooms(roomRes.data);
+        setAvailablePeriods(periodsRes.data);
         // We get users with role TEACHER, we need their Teacher ID
         // Wait, the timetable needs `teacherId` (from Teacher model), not User ID!
         // So we need to fetch teachers properly.
@@ -146,17 +150,24 @@ export default function AdminSchedulePage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <select 
+          <input 
+            type="text"
+            list="period-options"
+            placeholder="Nom de la période..."
             value={period} 
             onChange={(e) => setPeriod(e.target.value)}
             className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-          >
-            <option value="Standard">Période : Standard</option>
-            <option value="Semestre 1">Période : Semestre 1</option>
-            <option value="Semestre 2">Période : Semestre 2</option>
-            <option value="Ramadan">Période : Ramadan</option>
-            <option value="Été">Période : Été</option>
-          </select>
+          />
+          <datalist id="period-options">
+            {availablePeriods.map(p => (
+              <option key={p} value={p} />
+            ))}
+            {!availablePeriods.includes("Standard") && <option value="Standard" />}
+            <option value="Semestre 1" />
+            <option value="Semestre 2" />
+            <option value="Ramadan" />
+            <option value="Été" />
+          </datalist>
           <Button 
             onClick={handleSave} 
             disabled={saving}
