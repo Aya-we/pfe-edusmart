@@ -16,8 +16,8 @@ export class ClassesController {
   }
 
   @Post()
-  create(@Body() data: any) {
-    return this.classesService.createClass(data);
+  create(@Body() createClassDto: { name: string, studentCount?: number, schoolId: string }) {
+    return this.classesService.createClass(createClassDto);
   }
 
   @Get(':id/students')

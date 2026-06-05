@@ -6,7 +6,7 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Body() createRoomDto: { name: string, schoolId: string }) {
+  create(@Body() createRoomDto: { name: string, capacity?: number, schoolId: string }) {
     return this.roomsService.create(createRoomDto, createRoomDto.schoolId);
   }
 

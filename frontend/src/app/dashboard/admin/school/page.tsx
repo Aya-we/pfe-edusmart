@@ -32,6 +32,7 @@ export default function SchoolManagementPage() {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"class" | "subject" | "room">("class");
   const [newItemName, setNewItemName] = useState("");
+  const [newItemSize, setNewItemSize] = useState<number | "">("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"classes" | "subjects" | "rooms">("classes");
@@ -70,6 +71,7 @@ export default function SchoolManagementPage() {
       if (modalType === "class") {
         await axios.post(`${API}/classes`, {
           name: newItemName,
+          studentCount: newItemSize ? Number(newItemSize) : undefined,
           schoolId: user.schoolId
         });
       } else if (modalType === "subject") {
@@ -80,6 +82,7 @@ export default function SchoolManagementPage() {
       } else {
         await axios.post(`${API}/rooms`, {
           name: newItemName,
+          capacity: newItemSize ? Number(newItemSize) : undefined,
           schoolId: user.schoolId
         }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       }
@@ -87,6 +90,7 @@ export default function SchoolManagementPage() {
       await fetchData();
       setShowModal(false);
       setNewItemName("");
+      setNewItemSize("");
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erreur lors de la création.";
       setError(typeof msg === "string" ? msg : JSON.stringify(msg));
@@ -158,7 +162,7 @@ export default function SchoolManagementPage() {
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1 font-medium">
                       <Users className="w-4 h-4" />
-                      {cls._count?.students ?? cls.students?.length ?? 0} Élèves
+                      {cls.studentCount || 20} Places (Total: {cls._count?.students ?? cls.students?.length ?? 0} Inscrits)
                     </div>
                   </div>
                 </CardContent>
@@ -203,6 +207,12 @@ export default function SchoolManagementPage() {
                   </div>
                   
                   <h3 className="text-xl font-bold tracking-tight mb-4">{room.name}</h3>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1 font-medium">
+                      <Users className="w-4 h-4" />
+                      Capacité: {room.capacity || 30} Places
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))
@@ -229,6 +239,22 @@ export default function SchoolManagementPage() {
                   className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
                 />
               </div>
+
+              {modalType !== "subject" && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    {modalType === "class" ? "Nombre d'élèves" : "Capacité de la salle"}
+                  </label>
+                  <Input 
+                    type="number"
+                    min="1"
+                    placeholder={modalType === "class" ? "ex: 20" : "ex: 30"}
+                    value={newItemSize}
+                    onChange={(e) => setNewItemSize(e.target.value ? Number(e.target.value) : "")}
+                    className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
+                  />
+                </div>
+              )}
 
               {error && (
                 <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">

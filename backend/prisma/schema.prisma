@@ -85,10 +85,11 @@ model Parent {
 }
 
 model Class {
-  id        String   @id @default(uuid()) @db.VarChar(100)
-  name      String   @db.VarChar(191)
-  schoolId  String   @db.VarChar(100)
-  school    School   @relation(fields: [schoolId], references: [id])
+  id           String   @id @default(uuid()) @db.VarChar(100)
+  name         String   @db.VarChar(191)
+  studentCount Int      @default(20)
+  schoolId     String   @db.VarChar(100)
+  school       School   @relation(fields: [schoolId], references: [id])
   students  Student[]
   teacherClasses TeacherClass[]
   timetables Timetable[]
@@ -112,6 +113,7 @@ model Subject {
 model Room {
   id        String   @id @default(uuid()) @db.VarChar(100)
   name      String   @db.VarChar(191)
+  capacity  Int      @default(30)
   schoolId  String   @db.VarChar(100)
   school    School   @relation(fields: [schoolId], references: [id])
   timetables Timetable[]

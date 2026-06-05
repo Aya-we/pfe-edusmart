@@ -5,10 +5,11 @@ import { PrismaService } from '../prisma/prisma.service';
 export class RoomsService {
   constructor(private prisma: PrismaService) {}
 
-  create(createRoomDto: { name: string }, schoolId: string) {
+  create(data: { name: string, capacity?: number }, schoolId: string) {
     return this.prisma.room.create({
       data: {
-        name: createRoomDto.name,
+        name: data.name,
+        capacity: data.capacity ? Number(data.capacity) : 30,
         schoolId,
       },
     });

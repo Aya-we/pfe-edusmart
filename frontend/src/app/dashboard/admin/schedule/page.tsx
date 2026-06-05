@@ -220,10 +220,22 @@ export default function AdminSchedulePage() {
                         .map(c => schedule[c.id]?.[key]?.teacherId)
                         .filter(Boolean);
 
-                      const occupiedRooms = classes
-                        .filter(c => c.id !== cls.id)
-                        .map(c => schedule[c.id]?.[key]?.roomId)
-                        .filter(Boolean);
+                      const currentClassStudentCount = cls.studentCount || 20;
+
+                      // For each room, calculate how many students are currently assigned to it in this session
+                      // from OTHER classes.
+                      const getRoomOccupancy = (roomId: string) => {
+                        let totalStudents = 0;
+                        classes.forEach(c => {
+                          if (c.id !== cls.id) {
+                            const cCell = schedule[c.id]?.[key];
+                            if (cCell?.roomId === roomId) {
+                              totalStudents += (c.studentCount || 20);
+                            }
+                          }
+                        });
+                        return totalStudents;
+                      };
 
                       return (
                         <td key={`${cls.id}-${day.name}-${i}`} className="p-2 border-b border-r border-border min-w-[180px] bg-white dark:bg-background">
@@ -244,10 +256,15 @@ export default function AdminSchedulePage() {
                             >
                               <option value="">-- Salle --</option>
                               {rooms.map(r => {
-                                const isOccupied = occupiedRooms.includes(r.id);
+                                const currentOccupancy = getRoomOccupancy(r.id);
+                                const capacity = r.capacity || 30;
+                                const remainingCapacity = capacity - currentOccupancy;
+                                // If the current class doesn't fit in the remaining capacity, disable it
+                                const isFull = currentClassStudentCount > remainingCapacity;
+                                
                                 return (
-                                  <option key={r.id} value={r.id} disabled={isOccupied}>
-                                    {r.name} {isOccupied ? "(Occupée)" : ""}
+                                  <option key={r.id} value={r.id} disabled={isFull}>
+                                    {r.name} {isFull ? "(Pleine)" : `(${remainingCapacity} places rest.)`}
                                   </option>
                                 );
                               })}
