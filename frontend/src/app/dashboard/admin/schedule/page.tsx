@@ -214,6 +214,17 @@ export default function AdminSchedulePage() {
                     day.sessions.map((ses, i) => {
                       const key = `${day.name}|${ses.s}-${ses.e}`;
                       const cell = schedule[cls.id]?.[key] || {};
+                      
+                      const occupiedTeachers = classes
+                        .filter(c => c.id !== cls.id)
+                        .map(c => schedule[c.id]?.[key]?.teacherId)
+                        .filter(Boolean);
+
+                      const occupiedRooms = classes
+                        .filter(c => c.id !== cls.id)
+                        .map(c => schedule[c.id]?.[key]?.roomId)
+                        .filter(Boolean);
+
                       return (
                         <td key={`${cls.id}-${day.name}-${i}`} className="p-2 border-b border-r border-border min-w-[180px] bg-white dark:bg-background">
                           <div className="flex flex-col gap-1.5">
@@ -232,7 +243,14 @@ export default function AdminSchedulePage() {
                               onChange={e => handleCellChange(cls.id, day.name, ses.s, ses.e, "roomId", e.target.value)}
                             >
                               <option value="">-- Salle --</option>
-                              {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                              {rooms.map(r => {
+                                const isOccupied = occupiedRooms.includes(r.id);
+                                return (
+                                  <option key={r.id} value={r.id} disabled={isOccupied}>
+                                    {r.name} {isOccupied ? "(Occupée)" : ""}
+                                  </option>
+                                );
+                              })}
                             </select>
 
                             <select 
@@ -241,7 +259,14 @@ export default function AdminSchedulePage() {
                               onChange={e => handleCellChange(cls.id, day.name, ses.s, ses.e, "teacherId", e.target.value)}
                             >
                               <option value="">-- Prof --</option>
-                              {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                              {teachers.map(t => {
+                                const isOccupied = occupiedTeachers.includes(t.id);
+                                return (
+                                  <option key={t.id} value={t.id} disabled={isOccupied}>
+                                    {t.name} {isOccupied ? "(Occupé)" : ""}
+                                  </option>
+                                );
+                              })}
                             </select>
                           </div>
                         </td>
