@@ -20,6 +20,16 @@ export class ClassesController {
     return this.classesService.createClass(createClassDto);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() data: { name?: string, studentCount?: number }) {
+    return this.classesService.update(id, data);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.classesService.remove(id);
+  }
+
   @Get(':id/students')
   findStudents(@Param('id') id: string) {
     return this.classesService.findStudentsByClass(id);

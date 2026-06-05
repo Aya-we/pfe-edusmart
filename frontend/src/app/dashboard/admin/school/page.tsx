@@ -16,8 +16,16 @@ import {
   Check,
   Loader2,
   BookMarked,
-  DoorOpen
+  DoorOpen,
+  Edit2,
+  Trash2
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
@@ -35,6 +43,9 @@ export default function SchoolManagementPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"classes" | "subjects" | "rooms">("classes");
+
+  const [editingItem, setEditingItem] = useState<{ id: string, name: string, size?: number, type: "class" | "subject" | "room" } | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   const fetchData = async () => {
     try {
@@ -99,9 +110,40 @@ export default function SchoolManagementPage() {
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erreur lors de la création.";
       setError(typeof msg === "string" ? msg : JSON.stringify(msg));
-      console.error("Erreur creation classe:", err);
+      console.error("Erreur creation:", err);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    try {
+      const endpoint = editingItem.type === "class" ? "classes" : editingItem.type === "subject" ? "subjects" : "rooms";
+      const payload = { name: editingItem.name, ...(editingItem.type !== "subject" && { [editingItem.type === "class" ? "studentCount" : "capacity"]: editingItem.size }) };
+      
+      await axios.patch(`${API}/${endpoint}/${editingItem.id}`, payload, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await fetchData();
+      setEditingItem(null);
+    } catch (err: any) {
+      console.error(err);
+      alert("Erreur lors de la modification");
+    }
+  };
+
+  const handleDelete = async (id: string, type: "class" | "subject" | "room") => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer cet élément ?`)) return;
+    try {
+      setIsDeleting(id);
+      const endpoint = type === "class" ? "classes" : type === "subject" ? "subjects" : "rooms";
+      await axios.delete(`${API}/${endpoint}/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      await fetchData();
+    } catch (err: any) {
+      console.error(err);
+      alert("Erreur lors de la suppression");
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -159,7 +201,21 @@ export default function SchoolManagementPage() {
                     <div className="p-2 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
                       <School className="w-5 h-5" />
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: cls.id, name: cls.name, size: cls.studentCount, type: "class" })}>
+                          <Edit2 className="w-4 h-4 mr-2" /> Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={() => handleDelete(cls.id, "class")}>
+                          <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   
                   <h3 className="text-xl font-bold tracking-tight mb-4">{cls.name}</h3>
@@ -187,7 +243,21 @@ export default function SchoolManagementPage() {
                     <div className="p-2 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
                       <BookMarked className="w-5 h-5" />
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: sub.id, name: sub.name, type: "subject" })}>
+                          <Edit2 className="w-4 h-4 mr-2" /> Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={() => handleDelete(sub.id, "subject")}>
+                          <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   
                   <h3 className="text-xl font-bold tracking-tight mb-4">{sub.name}</h3>
@@ -208,7 +278,21 @@ export default function SchoolManagementPage() {
                     <div className="p-2 rounded-xl bg-muted group-hover:bg-foreground group-hover:text-background transition-all duration-300">
                       <DoorOpen className="w-5 h-5" />
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"><MoreHorizontal className="w-4 h-4" /></Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: room.id, name: room.name, size: room.capacity, type: "room" })}>
+                          <Edit2 className="w-4 h-4 mr-2" /> Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" onClick={() => handleDelete(room.id, "room")}>
+                          <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   
                   <h3 className="text-xl font-bold tracking-tight mb-4">{room.name}</h3>
@@ -302,6 +386,51 @@ export default function SchoolManagementPage() {
                 <Button type="button" variant="outline" className="flex-1 rounded-lg h-11" onClick={() => { setShowModal(false); setError(null); }}>Annuler</Button>
                 <Button type="submit" disabled={creating} className="flex-1 rounded-lg h-11 bg-primary text-primary-foreground hover:bg-foreground/90 font-bold transition-all">
                   {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Créer"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingItem && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border w-full max-w-sm rounded-2xl shadow-2xl p-8 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Modifier {editingItem.type === "class" ? "Classe" : editingItem.type === "subject" ? "Matière" : "Salle"}</h3>
+              <Button variant="ghost" size="icon" onClick={() => setEditingItem(null)}><X className="w-5 h-5" /></Button>
+            </div>
+
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom</label>
+                <Input 
+                  required 
+                  value={editingItem.name}
+                  onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                  className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
+                />
+              </div>
+
+              {editingItem.type !== "subject" && (
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    {editingItem.type === "class" ? "Nombre d'élèves" : "Capacité de la salle"}
+                  </label>
+                  <Input 
+                    type="number"
+                    min="1"
+                    value={editingItem.size || ""}
+                    onChange={(e) => setEditingItem({...editingItem, size: e.target.value ? Number(e.target.value) : undefined})}
+                    className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
+                  />
+                </div>
+              )}
+
+              <div className="pt-4 flex gap-3">
+                <Button type="button" variant="outline" className="flex-1 rounded-lg h-11" onClick={() => setEditingItem(null)}>Annuler</Button>
+                <Button type="submit" className="flex-1 rounded-lg h-11 bg-primary text-primary-foreground hover:bg-foreground/90 font-bold transition-all">
+                  Enregistrer
                 </Button>
               </div>
             </form>

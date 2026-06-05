@@ -36,9 +36,22 @@ export class ClassesService {
     return teacher?.teacherClasses.map((tc: any) => tc.class) || [];
   }
 
-  async createClass(data: { name: string; schoolId: string }) {
+  async createClass(data: { name: string; studentCount?: number; schoolId: string }) {
     return this.prisma.class.create({
       data,
+    });
+  }
+
+  async update(id: string, data: { name?: string; studentCount?: number }) {
+    return this.prisma.class.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.class.delete({
+      where: { id },
     });
   }
 

@@ -15,6 +15,11 @@ export class RoomsController {
     return this.roomsService.findAll(schoolId);
   }
 
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() data: { name?: string, capacity?: number }) {
+    return this.roomsService.update(id, data);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.roomsService.remove(id);

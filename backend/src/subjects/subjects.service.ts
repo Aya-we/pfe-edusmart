@@ -15,4 +15,17 @@ export class SubjectsService {
   async create(data: { name: string; schoolId: string }) {
     return this.prisma.subject.create({ data });
   }
+
+  async update(id: string, data: { name?: string }) {
+    return this.prisma.subject.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.subject.delete({
+      where: { id },
+    });
+  }
 }
