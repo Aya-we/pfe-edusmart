@@ -42,7 +42,7 @@ export default function SchoolManagementPage() {
       const [resClasses, resSubjects, resRooms] = await Promise.all([
         axios.get(`${API}/classes?schoolId=${user?.schoolId}`),
         axios.get(`${API}/subjects?schoolId=${user?.schoolId}`),
-        axios.get(`${API}/rooms`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
+        axios.get(`${API}/rooms?schoolId=${user?.schoolId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } })
       ]);
       setClasses(resClasses.data);
       setSubjects(resSubjects.data);
@@ -79,7 +79,8 @@ export default function SchoolManagementPage() {
         });
       } else {
         await axios.post(`${API}/rooms`, {
-          name: newItemName
+          name: newItemName,
+          schoolId: user.schoolId
         }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       }
 

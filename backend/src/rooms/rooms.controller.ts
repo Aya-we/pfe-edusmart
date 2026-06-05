@@ -1,20 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('rooms')
-@UseGuards(JwtAuthGuard)
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Body() createRoomDto: { name: string }, @Request() req: any) {
-    return this.roomsService.create(createRoomDto, req.user.schoolId);
+  create(@Body() createRoomDto: { name: string, schoolId: string }) {
+    return this.roomsService.create(createRoomDto, createRoomDto.schoolId);
   }
 
   @Get()
-  findAll(@Request() req: any) {
-    return this.roomsService.findAll(req.user.schoolId);
+  findAll(@Query('schoolId') schoolId: string) {
+    return this.roomsService.findAll(schoolId);
   }
 
   @Delete(':id')

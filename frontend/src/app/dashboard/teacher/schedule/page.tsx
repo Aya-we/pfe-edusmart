@@ -21,7 +21,7 @@ export default function TeacherSchedulePage() {
     const fetchSchedule = async () => {
       if (!token) return;
       try {
-        const res = await axios.get(`${API}/timetable/mine`, {
+        const res = await axios.get(`${API}/timetable/mine?userId=${user?.id}&role=${user?.role}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSchedule(res.data);

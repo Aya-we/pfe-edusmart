@@ -1,25 +1,22 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
 import { TimetableService } from './timetable.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('timetable')
-@UseGuards(JwtAuthGuard)
 export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
   @Get('all')
-  getAllForSchool(@Request() req: any) {
-    return this.timetableService.getAllForSchool(req.user.schoolId);
+  getAllForSchool(@Query('schoolId') schoolId: string) {
+    return this.timetableService.getAllForSchool(schoolId);
   }
 
   @Get('mine')
-  async getMine(@Request() req: any) {
-    const user = req.user;
-    if (user.role === 'TEACHER') {
-      return this.timetableService.getByTeacher(user.id);
-    } else if (user.role === 'STUDENT') {
+  async getMine(@Query('userId') userId: string, @Query('role') role: string) {
+    if (role === 'TEACHER') {
+      return this.timetableService.getByTeacher(userId);
+    } else if (role === 'STUDENT') {
       // Find student profile to get classId
-      const student = await this.timetableService.getStudentByUserId(user.id);
+      const student = await this.timetableService.getStudentByUserId(userId);
       if (student) {
         return this.timetableService.getByClass(student.classId);
       }
@@ -28,8 +25,8 @@ export class TimetableController {
   }
 
   @Post('bulk')
-  saveBulk(@Request() req: any, @Body() entries: any[]) {
-    return this.timetableService.saveBulk(req.user.schoolId, entries);
+  saveBulk(@Body() body: { schoolId: string, entries: any[] }) {
+    return this.timetableService.saveBulk(body.schoolId, body.entries);
   }
 
   @Get('class/:classId')

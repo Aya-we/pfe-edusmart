@@ -42,8 +42,8 @@ export default function AdminSchedulePage() {
           axios.get(`${API}/classes?schoolId=${user.schoolId}`),
           axios.get(`${API}/subjects?schoolId=${user.schoolId}`),
           axios.get(`${API}/users?role=TEACHER&schoolId=${user.schoolId}`, { headers }),
-          axios.get(`${API}/rooms`, { headers }),
-          axios.get(`${API}/timetable/all`, { headers })
+          axios.get(`${API}/rooms?schoolId=${user.schoolId}`, { headers }),
+          axios.get(`${API}/timetable/all?schoolId=${user.schoolId}`, { headers })
         ]);
 
         setClasses(clsRes.data);
@@ -120,7 +120,7 @@ export default function AdminSchedulePage() {
         });
       });
 
-      await axios.post(`${API}/timetable/bulk`, entries, {
+      await axios.post(`${API}/timetable/bulk`, { schoolId: user?.schoolId, entries }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(true);
