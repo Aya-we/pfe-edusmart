@@ -11,9 +11,9 @@ export class TimetableService {
     });
   }
 
-  async getByClass(classId: string) {
+  async getByClass(classId: string, period: string) {
     return this.prisma.timetable.findMany({
-      where: { classId },
+      where: { classId, period },
       include: {
         subject: true,
         teacher: { include: { user: true } },
@@ -26,12 +26,12 @@ export class TimetableService {
     });
   }
 
-  async getAllForSchool(schoolId: string) {
+  async getAllForSchool(schoolId: string, period: string) {
     const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
     const classIds = classes.map(c => c.id);
 
     return this.prisma.timetable.findMany({
-      where: { classId: { in: classIds } },
+      where: { classId: { in: classIds }, period },
       include: {
         subject: true,
         teacher: { include: { user: true } },
@@ -41,7 +41,7 @@ export class TimetableService {
     });
   }
 
-  async getByTeacher(teacherUserId: string) {
+  async getByTeacher(teacherUserId: string, period: string) {
     const teacher = await this.prisma.teacher.findUnique({
       where: { userId: teacherUserId }
     });
@@ -49,7 +49,7 @@ export class TimetableService {
     if (!teacher) return [];
 
     return this.prisma.timetable.findMany({
-      where: { teacherId: teacher.id },
+      where: { teacherId: teacher.id, period },
       include: {
         subject: true,
         class: true,
@@ -62,19 +62,20 @@ export class TimetableService {
     });
   }
 
-  async saveBulk(schoolId: string, entries: any[]) {
+  async saveBulk(schoolId: string, period: string, entries: any[]) {
     const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
     const classIds = classes.map(c => c.id);
 
-    // Delete existing
+    // Delete existing for this period
     await this.prisma.timetable.deleteMany({
-      where: { classId: { in: classIds } }
+      where: { classId: { in: classIds }, period }
     });
 
     // Insert new
     if (entries.length > 0) {
+      const entriesWithPeriod = entries.map(e => ({ ...e, period }));
       await this.prisma.timetable.createMany({
-        data: entries
+        data: entriesWithPeriod
       });
     }
     return { success: true, count: entries.length };

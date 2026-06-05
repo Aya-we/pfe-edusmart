@@ -24,6 +24,7 @@ export default function AdminSchedulePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [period, setPeriod] = useState("Standard");
 
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -43,7 +44,7 @@ export default function AdminSchedulePage() {
           axios.get(`${API}/subjects?schoolId=${user.schoolId}`),
           axios.get(`${API}/users?role=TEACHER&schoolId=${user.schoolId}`, { headers }),
           axios.get(`${API}/rooms?schoolId=${user.schoolId}`, { headers }),
-          axios.get(`${API}/timetable/all?schoolId=${user.schoolId}`, { headers })
+          axios.get(`${API}/timetable/all?schoolId=${user.schoolId}&period=${period}`, { headers })
         ]);
 
         setClasses(clsRes.data);
@@ -83,7 +84,7 @@ export default function AdminSchedulePage() {
       }
     };
     fetchData();
-  }, [user, token]);
+  }, [user, token, period]);
 
   const handleCellChange = (classId: string, day: string, s: string, e: string, field: string, value: string) => {
     const key = `${day}|${s}-${e}`;
@@ -120,7 +121,7 @@ export default function AdminSchedulePage() {
         });
       });
 
-      await axios.post(`${API}/timetable/bulk`, { schoolId: user?.schoolId, entries }, {
+      await axios.post(`${API}/timetable/bulk`, { schoolId: user?.schoolId, period, entries }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSuccess(true);
@@ -144,14 +145,27 @@ export default function AdminSchedulePage() {
             <CalendarDays className="w-5 h-5" /> Générateur Manuel
           </p>
         </div>
-        <Button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="rounded-xl h-12 px-8 font-bold bg-primary text-primary-foreground gap-2 shadow-xl shadow-primary/20"
-        >
-          {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-          {saving ? "Sauvegarde..." : "Valider l'emploi du temps"}
-        </Button>
+        <div className="flex items-center gap-4">
+          <select 
+            value={period} 
+            onChange={(e) => setPeriod(e.target.value)}
+            className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+          >
+            <option value="Standard">Période : Standard</option>
+            <option value="Semestre 1">Période : Semestre 1</option>
+            <option value="Semestre 2">Période : Semestre 2</option>
+            <option value="Ramadan">Période : Ramadan</option>
+            <option value="Été">Période : Été</option>
+          </select>
+          <Button 
+            onClick={handleSave} 
+            disabled={saving}
+            className="rounded-xl h-12 px-8 font-bold bg-primary text-primary-foreground gap-2 shadow-xl shadow-primary/20"
+          >
+            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            {saving ? "Sauvegarde..." : "Valider l'emploi du temps"}
+          </Button>
+        </div>
       </div>
 
       <div className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm">

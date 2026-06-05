@@ -147,6 +147,7 @@ model Timetable {
   day       String
   startTime String
   endTime   String
+  period    String   @default("Standard") @db.VarChar(100)
   classId   String
   class     Class    @relation(fields: [classId], references: [id])
   subjectId String
@@ -178,6 +179,17 @@ model Exam {
   class     Class    @relation(fields: [classId], references: [id])
   subjectId String   @db.VarChar(100)
   subject   Subject  @relation(fields: [subjectId], references: [id])
+  schoolId  String   @db.VarChar(100)
+}
+
+model TeacherAbsence {
+  id        String   @id @default(uuid()) @db.VarChar(100)
+  date      DateTime
+  reason    String?  @db.Text
+  teacherId String   @db.VarChar(100)
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  schoolId  String   @db.VarChar(100)
+  createdAt DateTime @default(now())
 }
 
 model Homework {
