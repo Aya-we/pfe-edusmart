@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import axios from "axios";
 
 interface User {
@@ -41,8 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  const pathname = usePathname();
+
   useEffect(() => {
-    if (user?.schoolId) {
+    if (user?.schoolId && pathname?.startsWith('/dashboard')) {
       axios.get(`${API}/schools/${user.schoolId}`).then((res) => {
         const themeSettings = res.data.themeSettings;
         if (themeSettings) {
@@ -59,8 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }).catch(err => console.error(err));
+    } else {
+      // Nettoyer le thème si on n'est pas dans le dashboard (ex: Page d'accueil)
+      document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--background');
     }
-  }, [user]);
+  }, [user, pathname]);
 
   const login = async (email: string, password: string) => {
     try {
