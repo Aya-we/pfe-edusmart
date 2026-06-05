@@ -8,12 +8,12 @@ export class TimetableController {
   constructor(private readonly timetableService: TimetableService) {}
 
   @Get('all')
-  getAllForSchool(@Request() req) {
+  getAllForSchool(@Request() req: any) {
     return this.timetableService.getAllForSchool(req.user.schoolId);
   }
 
   @Get('mine')
-  async getMine(@Request() req) {
+  async getMine(@Request() req: any) {
     const user = req.user;
     if (user.role === 'TEACHER') {
       return this.timetableService.getByTeacher(user.id);
@@ -28,7 +28,7 @@ export class TimetableController {
   }
 
   @Post('bulk')
-  saveBulk(@Request() req, @Body() entries: any[]) {
+  saveBulk(@Request() req: any, @Body() entries: any[]) {
     return this.timetableService.saveBulk(req.user.schoolId, entries);
   }
 

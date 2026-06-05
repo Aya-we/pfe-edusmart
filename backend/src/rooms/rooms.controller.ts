@@ -8,12 +8,12 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Body() createRoomDto: { name: string }, @Request() req) {
+  create(@Body() createRoomDto: { name: string }, @Request() req: any) {
     return this.roomsService.create(createRoomDto, req.user.schoolId);
   }
 
   @Get()
-  findAll(@Request() req) {
+  findAll(@Request() req: any) {
     return this.roomsService.findAll(req.user.schoolId);
   }
 
