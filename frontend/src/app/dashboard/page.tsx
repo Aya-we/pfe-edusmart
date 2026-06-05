@@ -76,7 +76,7 @@ export default function StudentDashboard() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold">Emploi du temps</h3>
             {timetable.available ? (
-              <div className="flex items-center justify-between gap-4 p-5 rounded-2xl border border-foreground/20 bg-foreground text-background shadow-lg">
+              <div className="flex items-center justify-between gap-4 p-5 rounded-2xl border border-foreground/20 bg-primary text-primary-foreground shadow-lg">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-xl bg-background/10">
                     <FileText className="w-6 h-6" />

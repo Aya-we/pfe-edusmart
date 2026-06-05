@@ -53,7 +53,7 @@ const parentItems = [
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname  = usePathname();
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout, isLoading, schoolLogo } = useAuth();
   
   // ── Notifications state ──
   const [notifOpen,    setNotifOpen]    = useState(false);
@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <aside className="w-56 border-r border-border bg-background flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="bg-foreground text-background p-2 rounded-md shadow-sm">
+            <div className="bg-primary text-primary-foreground p-2 rounded-md shadow-sm">
               <GraduationCap className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight text-foreground">EduSmart</span>
@@ -228,7 +228,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             !n.read && "border-l-2 border-l-foreground bg-muted/20"
                           )}>
                             <div className="flex items-start gap-3">
-                              <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <MessageSquare className="w-4 h-4" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -271,9 +271,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     : "Étudiant"}
                 </p>
               </div>
-              <Avatar className="h-9 w-9 border border-border">
-                <AvatarImage src="" />
-                <AvatarFallback>
+              <Avatar className="h-10 w-10 border border-border bg-white p-0.5 shadow-sm">
+                <AvatarImage src={schoolLogo || ""} className="object-contain" />
+                <AvatarFallback className="bg-primary text-primary-foreground font-bold">
                   {user ? `${user.firstName[0]}${user.lastName[0]}` : "U"}
                 </AvatarFallback>
               </Avatar>

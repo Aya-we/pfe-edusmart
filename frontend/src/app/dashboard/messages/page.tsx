@@ -183,7 +183,7 @@ export default function MessagesPage() {
                   <p className="text-xs text-muted-foreground truncate">{contact.lastMessage}</p>
                 </div>
                 {contact.unread > 0 && (
-                  <div className="w-5 h-5 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0">
+                  <div className="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0">
                     {contact.unread}
                   </div>
                 )}
@@ -233,7 +233,7 @@ export default function MessagesPage() {
                   <div className={cn(
                     "max-w-[70%] px-5 py-3 rounded-2xl text-sm font-medium shadow-sm",
                     isMe
-                      ? "bg-foreground text-background rounded-tr-sm"
+                      ? "bg-primary text-primary-foreground rounded-tr-sm"
                       : "bg-background border border-border rounded-tl-sm"
                   )}>
                     <p>{msg.content}</p>
@@ -261,7 +261,7 @@ export default function MessagesPage() {
               <Button
                 type="submit"
                 disabled={sending || !newMsg.trim()}
-                className="h-12 w-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all"
+                className="h-12 w-12 rounded-xl bg-primary text-primary-foreground hover:bg-foreground/90 transition-all"
               >
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-5 h-5" />}
               </Button>

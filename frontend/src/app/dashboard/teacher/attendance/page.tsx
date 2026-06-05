@@ -189,7 +189,7 @@ export default function AttendancePage() {
         </div>
         
         <Button 
-          className="rounded-lg h-11 bg-foreground text-background hover:bg-foreground/90 transition-all px-8 gap-2 font-bold" 
+          className="rounded-lg h-11 bg-primary text-primary-foreground hover:bg-foreground/90 transition-all px-8 gap-2 font-bold" 
           onClick={handleSaveAll}
           disabled={isSaving}
         >
@@ -282,7 +282,7 @@ export default function AttendancePage() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-foreground text-background px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 text-sm font-bold"
+            className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 text-sm font-bold"
           >
             <CheckCircle2 className="w-4 h-4" />
             Appel enregistré avec succès

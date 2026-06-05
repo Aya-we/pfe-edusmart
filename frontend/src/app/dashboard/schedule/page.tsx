@@ -64,7 +64,7 @@ export default function StudentSchedulePage() {
           <Card className="rounded-2xl border border-border bg-background">
             <CardContent className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-foreground text-background"><FileText className="w-5 h-5" /></div>
+                <div className="p-3 rounded-xl bg-primary text-primary-foreground"><FileText className="w-5 h-5" /></div>
                 <div>
                   <p className="font-bold">Emploi du temps — Semaine courante</p>
                   <p className="text-xs text-muted-foreground mt-00.5">{filename}</p>
@@ -75,7 +75,7 @@ export default function StudentSchedulePage() {
                   <Button variant="outline" className="rounded-xl h-10 gap-2 text-sm font-bold"><ExternalLink className="w-4 h-4" /> Ouvrir</Button>
                 </a>
                 <a href={pdfUrl} download>
-                  <Button className="rounded-xl h-10 gap-2 text-sm font-bold bg-foreground text-background"><Download className="w-4 h-4" /> Télécharger</Button>
+                  <Button className="rounded-xl h-10 gap-2 text-sm font-bold bg-primary text-primary-foreground"><Download className="w-4 h-4" /> Télécharger</Button>
                 </a>
               </div>
             </CardContent>

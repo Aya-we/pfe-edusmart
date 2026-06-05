@@ -67,6 +67,15 @@ export default function AdminSettingsPage() {
       // Appliquer le thème dynamiquement
       if (themeSettings.primary) {
         document.documentElement.style.setProperty('--primary', themeSettings.primary);
+        
+        const hex = themeSettings.primary.replace('#', '');
+        if (hex.length === 6) {
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+          document.documentElement.style.setProperty('--primary-foreground', yiq >= 128 ? '#000000' : '#ffffff');
+        }
       }
       if (themeSettings.background) {
         document.documentElement.style.setProperty('--background', themeSettings.background);
@@ -161,7 +170,7 @@ export default function AdminSettingsPage() {
                     <ImageIcon className="w-8 h-8 text-muted-foreground" />
                   )}
                 </div>
-                <label className="absolute -bottom-2 -right-2 p-2 bg-foreground text-background rounded-xl cursor-pointer hover:scale-110 transition-all shadow-lg">
+                <label className="absolute -bottom-2 -right-2 p-2 bg-primary text-primary-foreground rounded-xl cursor-pointer hover:scale-110 transition-all shadow-lg">
                   <Upload className="w-4 h-4" />
                   <input type="file" className="hidden" onChange={handleLogoUpload} />
                 </label>
@@ -284,7 +293,7 @@ export default function AdminSettingsPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="fixed bottom-10 right-10 bg-foreground text-background px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 font-bold border border-border"
+          className="fixed bottom-10 right-10 bg-primary text-primary-foreground px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 font-bold border border-border"
         >
           <CheckCircle2 className="w-5 h-5 text-green-500" />
           Modifications enregistrées !

@@ -82,7 +82,7 @@ export default function StudentGradesPage() {
                     <TableCell className="text-center font-black text-lg">{avg.average}</TableCell>
                     <TableCell className="text-right pr-8">
                       <div className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                        Number.parseFloat(avg.average) >= 10 ? 'border-foreground bg-foreground text-background' : 'border-destructive text-destructive'
+                        Number.parseFloat(avg.average) >= 10 ? 'border-foreground bg-primary text-primary-foreground' : 'border-destructive text-destructive'
                       }`}>
                         {Number.parseFloat(avg.average) >= 10 ? 'Validé' : 'Échec'}
                       </div>
@@ -101,7 +101,7 @@ export default function StudentGradesPage() {
             <p className="text-muted-foreground font-medium mb-8 leading-relaxed">
               Basé sur tes résultats actuels, tu es en bonne voie. Continue de te concentrer sur les matières scientifiques pour maintenir ta moyenne.
             </p>
-            <Button className="w-fit h-12 rounded-xl bg-foreground text-background px-8 font-bold gap-2">
+            <Button className="w-fit h-12 rounded-xl bg-primary text-primary-foreground px-8 font-bold gap-2">
               Voir le planning de révision
               <ArrowRight className="w-4 h-4" />
             </Button>

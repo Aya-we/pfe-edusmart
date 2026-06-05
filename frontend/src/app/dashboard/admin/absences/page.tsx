@@ -123,7 +123,7 @@ export default function AdminAbsencesPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Button 
                         size="icon" 
-                        className="h-9 w-9 rounded-xl bg-foreground text-background hover:bg-foreground/90 transition-all"
+                        className="h-9 w-9 rounded-xl bg-primary text-primary-foreground hover:bg-foreground/90 transition-all"
                         onClick={() => handleAction(item.id, 'approve')}
                       >
                         <Check className="w-4 h-4" />

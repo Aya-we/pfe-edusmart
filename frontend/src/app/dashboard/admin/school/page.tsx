@@ -101,13 +101,13 @@ export default function SchoolManagementPage() {
           <div className="flex gap-4 mt-6">
             <button 
               onClick={() => setActiveTab("classes")}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "classes" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "classes" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
             >
               Classes
             </button>
             <button 
               onClick={() => setActiveTab("subjects")}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "subjects" ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === "subjects" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
             >
               Matières
             </button>
@@ -116,7 +116,7 @@ export default function SchoolManagementPage() {
 
         <Button 
           onClick={() => { setModalType(activeTab === "classes" ? "class" : "subject"); setShowModal(true); }}
-          className="rounded-lg h-10 bg-foreground text-background hover:bg-foreground/90 transition-all px-6 gap-2"
+          className="rounded-lg h-10 bg-primary text-primary-foreground hover:bg-foreground/90 transition-all px-6 gap-2"
         >
           <Plus className="w-4 h-4" />
           Nouvelle {activeTab === "classes" ? "Classe" : "Matière"}
@@ -202,7 +202,7 @@ export default function SchoolManagementPage() {
 
               <div className="pt-4 flex gap-3">
                 <Button type="button" variant="outline" className="flex-1 rounded-lg h-11" onClick={() => { setShowModal(false); setError(null); }}>Annuler</Button>
-                <Button type="submit" disabled={creating} className="flex-1 rounded-lg h-11 bg-foreground text-background hover:bg-foreground/90 font-bold transition-all">
+                <Button type="submit" disabled={creating} className="flex-1 rounded-lg h-11 bg-primary text-primary-foreground hover:bg-foreground/90 font-bold transition-all">
                   {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Créer"}
                 </Button>
               </div>

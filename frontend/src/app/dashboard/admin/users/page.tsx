@@ -165,7 +165,7 @@ export default function UsersManagementPage() {
           <p className="text-muted-foreground mt-2 text-lg">{users.length} membre(s) dans l'établissement.</p>
         </div>
         <Button onClick={() => setShowModal(true)}
-          className="rounded-lg h-10 bg-foreground text-background hover:bg-foreground/90 px-6 gap-2">
+          className="rounded-lg h-10 bg-primary text-primary-foreground hover:bg-foreground/90 px-6 gap-2">
           <UserPlus className="w-4 h-4" /> Ajouter un utilisateur
         </Button>
       </div>
@@ -329,7 +329,7 @@ export default function UsersManagementPage() {
               {/* Boutons */}
               <div className="pt-4 flex gap-3">
                 <Button type="button" variant="outline" className="flex-1 rounded-xl h-12" onClick={closeModal}>Annuler</Button>
-                <Button type="submit" className="flex-1 rounded-xl h-12 bg-foreground text-background font-bold">
+                <Button type="submit" className="flex-1 rounded-xl h-12 bg-primary text-primary-foreground font-bold">
                   {isEditing ? "Enregistrer" : "Créer le compte"}
                 </Button>
               </div>

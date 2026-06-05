@@ -107,7 +107,7 @@ export default function ParentDashboard() {
             </p>
           </div>
           <Link href="/dashboard/messages">
-            <Button className="rounded-xl px-8 h-12 gap-2 bg-foreground text-background font-bold">
+            <Button className="rounded-xl px-8 h-12 gap-2 bg-primary text-primary-foreground font-bold">
               <MessageSquare className="w-4 h-4" /> Contacter l'administration
             </Button>
           </Link>
@@ -121,7 +121,7 @@ export default function ParentDashboard() {
                 <button key={child.id} onClick={() => setSelected(child.id)}
                   className={`px-5 py-20.5 rounded-xl text-sm font-bold border transition-all ${
                     selected === child.id
-                      ? "bg-foreground text-background border-foreground"
+                      ? "bg-primary text-primary-foreground border-foreground"
                       : "border-border text-muted-foreground hover:border-foreground/30"
                   }`}>
                   {child.user.firstName} {child.user.lastName}
@@ -138,7 +138,7 @@ export default function ParentDashboard() {
               <Card className="rounded-3xl border border-border bg-background shadow-sm overflow-hidden">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-5 mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-foreground text-background flex items-center justify-center font-black text-xl">
+                    <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-black text-xl">
                       {activeChild.user.firstName[0]}{activeChild.user.lastName[0]}
                     </div>
                     <div>

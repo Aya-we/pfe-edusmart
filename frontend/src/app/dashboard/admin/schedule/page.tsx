@@ -117,7 +117,7 @@ export default function AdminSchedulePage() {
               const cfg = labels[t];
               return (
                 <button key={t} onClick={() => { setType(t); setFile(null); setStatus("idle"); }}
-                  className={`flex items-center gap-2 px-5 py-20.5 rounded-xl text-sm font-bold border transition-all ${type === t ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}>
+                  className={`flex items-center gap-2 px-5 py-20.5 rounded-xl text-sm font-bold border transition-all ${type === t ? "bg-primary text-primary-foreground border-foreground" : "border-border text-muted-foreground hover:border-foreground/30"}`}>
                   <cfg.icon className="w-4 h-4" /> {cfg.label}
                 </button>
               );
@@ -163,7 +163,7 @@ export default function AdminSchedulePage() {
           <Button
             disabled={!file || uploading}
             onClick={handleUpload}
-            className="w-full h-12 rounded-xl bg-foreground text-background font-bold gap-2"
+            className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold gap-2"
           >
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
             {uploading ? "Publication en cours..." : `Publier pour les ${type === "students" ? "Étudiants" : "Professeurs"}`}

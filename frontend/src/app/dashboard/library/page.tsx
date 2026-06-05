@@ -122,7 +122,7 @@ export default function LibraryPage() {
         </div>
         {canUpload && (
           <Button onClick={() => setShowModal(true)}
-            className="rounded-xl h-11 bg-foreground text-background hover:bg-foreground/90 px-6 gap-2">
+            className="rounded-xl h-11 bg-primary text-primary-foreground hover:bg-foreground/90 px-6 gap-2">
             <Upload className="w-4 h-4" /> Uploader un cours
           </Button>
         )}
@@ -296,7 +296,7 @@ export default function LibraryPage() {
                       onClick={() => { setShowModal(false); setFile(null); setTitle(""); }}>
                       Annuler
                     </Button>
-                    <Button type="submit" disabled={!file || uploading} className="flex-1 rounded-xl h-12 bg-foreground text-background font-bold gap-2">
+                    <Button type="submit" disabled={!file || uploading} className="flex-1 rounded-xl h-12 bg-primary text-primary-foreground font-bold gap-2">
                       {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {uploading ? "Upload..." : "Publier"}
                     </Button>

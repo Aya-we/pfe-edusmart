@@ -19,6 +19,7 @@ interface AuthContextType {
   login: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  schoolLogo: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,6 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [schoolLogo, setSchoolLogo] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,12 +48,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user?.schoolId && pathname?.startsWith('/dashboard')) {
       axios.get(`${API}/schools/${user.schoolId}`).then((res) => {
+        setSchoolLogo(res.data.logo || null);
         const themeSettings = res.data.themeSettings;
         if (themeSettings) {
           try {
             const settings = typeof themeSettings === "string" ? JSON.parse(themeSettings) : themeSettings;
             if (settings.primary) {
               document.documentElement.style.setProperty('--primary', settings.primary);
+              
+              // Calculate contrast for text
+              const hex = settings.primary.replace('#', '');
+              if (hex.length === 6) {
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                document.documentElement.style.setProperty('--primary-foreground', yiq >= 128 ? '#000000' : '#ffffff');
+              }
             }
             if (settings.background) {
               document.documentElement.style.setProperty('--background', settings.background);
@@ -64,6 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       // Nettoyer le thème si on n'est pas dans le dashboard (ex: Page d'accueil)
       document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--primary-foreground');
       document.documentElement.style.removeProperty('--background');
     }
   }, [user, pathname]);
@@ -103,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isLoading, schoolLogo }}>
       {children}
     </AuthContext.Provider>
   );
