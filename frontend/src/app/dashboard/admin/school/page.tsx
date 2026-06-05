@@ -31,8 +31,7 @@ export default function SchoolManagementPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"class" | "subject" | "room">("class");
-  const [newItemName, setNewItemName] = useState("");
-  const [newItemSize, setNewItemSize] = useState<number | "">("");
+  const [items, setItems] = useState<{name: string, size: number | ""}[]>([{ name: "", size: "" }]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"classes" | "subjects" | "rooms">("classes");
@@ -68,29 +67,35 @@ export default function SchoolManagementPage() {
     }
     setCreating(true);
     try {
-      if (modalType === "class") {
-        await axios.post(`${API}/classes`, {
-          name: newItemName,
-          studentCount: newItemSize ? Number(newItemSize) : undefined,
-          schoolId: user.schoolId
-        });
-      } else if (modalType === "subject") {
-        await axios.post(`${API}/subjects`, {
-          name: newItemName,
-          schoolId: user.schoolId
-        });
-      } else {
-        await axios.post(`${API}/rooms`, {
-          name: newItemName,
-          capacity: newItemSize ? Number(newItemSize) : undefined,
-          schoolId: user.schoolId
-        }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-      }
+      const validItems = items.filter(item => item.name.trim() !== "");
+      if (validItems.length === 0) return;
+
+      const requests = validItems.map(item => {
+        if (modalType === "class") {
+          return axios.post(`${API}/classes`, {
+            name: item.name,
+            studentCount: item.size ? Number(item.size) : undefined,
+            schoolId: user.schoolId
+          });
+        } else if (modalType === "subject") {
+          return axios.post(`${API}/subjects`, {
+            name: item.name,
+            schoolId: user.schoolId
+          });
+        } else {
+          return axios.post(`${API}/rooms`, {
+            name: item.name,
+            capacity: item.size ? Number(item.size) : undefined,
+            schoolId: user.schoolId
+          }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+        }
+      });
+
+      await Promise.all(requests);
 
       await fetchData();
       setShowModal(false);
-      setNewItemName("");
-      setNewItemSize("");
+      setItems([{ name: "", size: "" }]);
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erreur lors de la création.";
       setError(typeof msg === "string" ? msg : JSON.stringify(msg));
@@ -222,39 +227,70 @@ export default function SchoolManagementPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-background border border-border w-full max-w-sm rounded-2xl shadow-2xl p-8 space-y-6">
+          <div className="bg-background border border-border w-full max-w-md rounded-2xl shadow-2xl p-8 space-y-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold">Nouvelle {modalType === "class" ? "Classe" : modalType === "subject" ? "Matière" : "Salle"}</h3>
               <Button variant="ghost" size="icon" onClick={() => setShowModal(false)}><X className="w-5 h-5" /></Button>
             </div>
 
             <form onSubmit={handleCreate} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom</label>
-                <Input 
-                  required 
-                  placeholder={modalType === "class" ? "ex: 2ème BAC Physique 1" : modalType === "subject" ? "ex: Mathématiques" : "ex: Salle 12"}
-                  value={newItemName}
-                  onChange={(e) => setNewItemName(e.target.value)}
-                  className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
-                />
-              </div>
+              {items.map((item, index) => (
+                <div key={index} className="flex items-end gap-3 p-4 bg-muted/30 rounded-xl border border-border relative">
+                  {items.length > 1 && (
+                    <button 
+                      type="button" 
+                      onClick={() => setItems(items.filter((_, i) => i !== index))}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-sm hover:scale-110 transition-transform"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  <div className="space-y-2 flex-1">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Nom</label>
+                    <Input 
+                      required 
+                      placeholder={modalType === "class" ? "ex: 2ème BAC PC 1" : modalType === "subject" ? "ex: Maths" : "ex: Salle 12"}
+                      value={item.name}
+                      onChange={(e) => {
+                        const newItems = [...items];
+                        newItems[index].name = e.target.value;
+                        setItems(newItems);
+                      }}
+                      className="rounded-lg h-10 border-border bg-background focus:ring-1 focus:ring-foreground transition-all" 
+                    />
+                  </div>
 
-              {modalType !== "subject" && (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                    {modalType === "class" ? "Nombre d'élèves" : "Capacité de la salle"}
-                  </label>
-                  <Input 
-                    type="number"
-                    min="1"
-                    placeholder={modalType === "class" ? "ex: 20" : "ex: 30"}
-                    value={newItemSize}
-                    onChange={(e) => setNewItemSize(e.target.value ? Number(e.target.value) : "")}
-                    className="rounded-lg h-11 border-border focus:ring-1 focus:ring-foreground transition-all" 
-                  />
+                  {modalType !== "subject" && (
+                    <div className="space-y-2 w-28">
+                      <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground truncate">
+                        {modalType === "class" ? "Élèves" : "Capacité"}
+                      </label>
+                      <Input 
+                        type="number"
+                        min="1"
+                        placeholder={modalType === "class" ? "ex: 20" : "ex: 30"}
+                        value={item.size}
+                        onChange={(e) => {
+                          const newItems = [...items];
+                          newItems[index].size = e.target.value ? Number(e.target.value) : "";
+                          setItems(newItems);
+                        }}
+                        className="rounded-lg h-10 border-border bg-background focus:ring-1 focus:ring-foreground transition-all" 
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
+
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full border-dashed border-2 py-6 text-muted-foreground hover:text-foreground"
+                onClick={() => setItems([...items, { name: "", size: "" }])}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Ajouter une autre ligne
+              </Button>
 
               {error && (
                 <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
