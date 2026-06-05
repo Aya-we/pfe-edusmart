@@ -22,7 +22,6 @@ const studentItems = [
   { icon: ClipboardCheck,  label: "Présences",        href: "/dashboard/attendance" },
   { icon: Calendar,        label: "Emploi du temps",  href: "/dashboard/schedule" },
   { icon: BookOpen,        label: "Bibliothèque",     href: "/dashboard/library" },
-  { icon: Sparkles,        label: "EduSmart AI",      href: "/dashboard/ai" },
   { icon: MessageSquare,   label: "Messagerie",       href: "/dashboard/messages" },
 ];
 
