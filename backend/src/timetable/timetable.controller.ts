@@ -35,13 +35,13 @@ export class TimetableController {
   }
 
   @Get('class/:classId')
-  getByClass(@Param('classId') classId: string) {
-    return this.timetableService.getByClass(classId);
+  getByClass(@Param('classId') classId: string, @Query('period') period: string = 'Standard') {
+    return this.timetableService.getByClass(classId, period);
   }
 
   @Get('teacher/:userId')
-  getByTeacher(@Param('userId') userId: string) {
-    return this.timetableService.getByTeacher(userId);
+  getByTeacher(@Param('userId') userId: string, @Query('period') period: string = 'Standard') {
+    return this.timetableService.getByTeacher(userId, period);
   }
 
   @Post()
