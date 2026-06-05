@@ -16,6 +16,7 @@ export default function StudentSchedulePage() {
   const { user, token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [schedule, setSchedule] = useState<any[]>([]);
+  const [absences, setAbsences] = useState<any[]>([]);
   const [exams, setExams] = useState<any[]>([]);
   const [period, setPeriod] = useState("Standard");
   const [availablePeriods, setAvailablePeriods] = useState<string[]>([]);
