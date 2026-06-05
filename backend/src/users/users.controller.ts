@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Delete, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -20,8 +20,13 @@ export class UsersController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: any) {
-    return this.usersService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: any) {
+    try {
+      return await this.usersService.update(id, data);
+    } catch (error: any) {
+      console.error('Error updating user:', error);
+      throw new HttpException(error.message || 'Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Delete(':id')

@@ -55,7 +55,7 @@ export default function StudentDashboard() {
     : 100;
 
   const avgGeneral = grades.length > 0
-    ? (grades.reduce((s: number, g: any) => s + (g.average || 0), 0) / grades.length).toFixed(2)
+    ? (grades.reduce((s: number, g: any) => s + Number(g.average || 0), 0) / grades.length).toFixed(2)
     : "—";
 
   return (
@@ -130,8 +130,8 @@ export default function StudentDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {grades.map((item: any, i: number) => (
                   <div key={i} className="p-5 rounded-2xl border border-border bg-background hover:border-foreground/20 transition-all group">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">{item.subjectName || "Matière"}</p>
-                    <p className="text-2xl font-black mb-1">{(item.average || 0).toFixed(1)}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">{item.subject || item.subjectName || "Matière"}</p>
+                    <p className="text-2xl font-black mb-1">{Number(item.average || 0).toFixed(1)}</p>
                     <p className="text-xs text-muted-foreground">/20</p>
                   </div>
                 ))}
