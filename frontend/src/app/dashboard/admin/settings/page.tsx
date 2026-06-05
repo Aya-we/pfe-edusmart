@@ -63,6 +63,15 @@ export default function AdminSettingsPage() {
     setError(null);
     try {
       await axios.put(`${API}/schools/${school.id}`, { ...school, themeSettings });
+      
+      // Appliquer le thème dynamiquement
+      if (themeSettings.primary) {
+        document.documentElement.style.setProperty('--primary', themeSettings.primary);
+      }
+      if (themeSettings.background) {
+        document.documentElement.style.setProperty('--background', themeSettings.background);
+      }
+      
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
@@ -234,7 +243,7 @@ export default function AdminSettingsPage() {
           <Button 
             type="submit" 
             disabled={isSaving}
-            className="rounded-xl h-14 bg-foreground text-background hover:bg-foreground/90 font-bold px-12 gap-3 transition-all shadow-xl shadow-foreground/10"
+            className="rounded-xl h-14 bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-12 gap-3 transition-all shadow-xl shadow-primary/10"
           >
             {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             Mettre à jour les paramètres
