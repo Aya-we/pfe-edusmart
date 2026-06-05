@@ -202,10 +202,8 @@ export default function SchoolManagementPage() {
                       <School className="w-5 h-5" />
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8">
+                        <MoreHorizontal className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40 rounded-xl">
                         <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: cls.id, name: cls.name, size: cls.studentCount, type: "class" })}>
@@ -244,10 +242,8 @@ export default function SchoolManagementPage() {
                       <BookMarked className="w-5 h-5" />
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8">
+                        <MoreHorizontal className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40 rounded-xl">
                         <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: sub.id, name: sub.name, type: "subject" })}>
@@ -279,10 +275,8 @@ export default function SchoolManagementPage() {
                       <DoorOpen className="w-5 h-5" />
                     </div>
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg outline-none">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8">
+                        <MoreHorizontal className="w-4 h-4" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40 rounded-xl">
                         <DropdownMenuItem className="cursor-pointer" onClick={() => setEditingItem({ id: room.id, name: room.name, size: room.capacity, type: "room" })}>
