@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
+import { Palette } from "lucide-react";
+import { Color } from "color-thief-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -30,6 +32,7 @@ export default function AdminSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [themeSettings, setThemeSettings] = useState({ primary: "#000000", background: "#ffffff" });
 
   useEffect(() => {
     const fetchSchool = async () => {
@@ -37,6 +40,13 @@ export default function AdminSettingsPage() {
       try {
         const response = await axios.get(`${API}/schools/${user.schoolId}`);
         setSchool(response.data);
+        if (response.data.themeSettings) {
+          setThemeSettings(
+            typeof response.data.themeSettings === "string" 
+              ? JSON.parse(response.data.themeSettings) 
+              : response.data.themeSettings
+          );
+        }
       } catch (error) {
         console.error("Error fetching school:", error);
         setError("Impossible de charger les données de l'école.");
@@ -52,7 +62,7 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     setError(null);
     try {
-      await axios.put(`${API}/schools/${school.id}`, school);
+      await axios.put(`${API}/schools/${school.id}`, { ...school, themeSettings });
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
@@ -144,6 +154,79 @@ export default function AdminSettingsPage() {
                 />
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Theming section */}
+        <Card className="rounded-3xl border border-border bg-background shadow-sm overflow-hidden">
+          <div className="p-8 border-b border-border bg-muted/20 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Palette className="w-5 h-5 text-muted-foreground" />
+              <h3 className="font-bold text-sm uppercase tracking-widest">Thème & Couleurs</h3>
+            </div>
+          </div>
+          <CardContent className="p-8 space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Couleur Primaire (Boutons, Liens)</label>
+                <div className="flex items-center gap-4">
+                  <Input 
+                    type="color" 
+                    value={themeSettings.primary} 
+                    onChange={(e) => setThemeSettings({...themeSettings, primary: e.target.value})}
+                    className="w-16 h-16 p-1 rounded-2xl cursor-pointer"
+                  />
+                  <Input 
+                    value={themeSettings.primary} 
+                    onChange={(e) => setThemeSettings({...themeSettings, primary: e.target.value})}
+                    className="flex-1 rounded-xl h-12 font-mono uppercase"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Couleur d'Arrière-plan</label>
+                <div className="flex items-center gap-4">
+                  <Input 
+                    type="color" 
+                    value={themeSettings.background} 
+                    onChange={(e) => setThemeSettings({...themeSettings, background: e.target.value})}
+                    className="w-16 h-16 p-1 rounded-2xl cursor-pointer"
+                  />
+                  <Input 
+                    value={themeSettings.background} 
+                    onChange={(e) => setThemeSettings({...themeSettings, background: e.target.value})}
+                    className="flex-1 rounded-xl h-12 font-mono uppercase"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {school?.logo && (
+              <div className="space-y-4 pt-6 border-t border-border/50">
+                <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Suggestions depuis le Logo</label>
+                <Color src={school.logo} crossOrigin="anonymous" format="hex">
+                  {({ data, loading }) => {
+                    if (loading) return <p className="text-sm text-muted-foreground">Extraction des couleurs...</p>;
+                    if (!data) return <p className="text-sm text-muted-foreground">Impossible d'extraire la couleur.</p>;
+                    return (
+                      <div className="flex flex-col gap-3">
+                        <p className="text-xs text-muted-foreground">Nous avons détecté cette couleur dominante dans votre logo :</p>
+                        <div className="flex items-center gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setThemeSettings({ ...themeSettings, primary: data })}
+                            className="w-12 h-12 rounded-full shadow-md hover:scale-110 transition-transform"
+                            style={{ backgroundColor: data }}
+                            title="Utiliser comme couleur primaire"
+                          />
+                          <span className="font-mono text-sm">{data}</span>
+                        </div>
+                      </div>
+                    );
+                  }}
+                </Color>
+              </div>
+            )}
           </CardContent>
         </Card>
 

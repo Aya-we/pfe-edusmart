@@ -41,6 +41,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (user?.schoolId) {
+      axios.get(`${API}/schools/${user.schoolId}`).then((res) => {
+        const themeSettings = res.data.themeSettings;
+        if (themeSettings) {
+          try {
+            const settings = typeof themeSettings === "string" ? JSON.parse(themeSettings) : themeSettings;
+            if (settings.primary) {
+              document.documentElement.style.setProperty('--primary', settings.primary);
+            }
+            if (settings.background) {
+              document.documentElement.style.setProperty('--background', settings.background);
+            }
+          } catch (e) {
+            console.error("Failed to parse theme settings", e);
+          }
+        }
+      }).catch(err => console.error(err));
+    }
+  }, [user]);
+
   const login = async (email: string, password: string) => {
     try {
       const response = await axios.post(`${API}/auth/login`, { email, password });
