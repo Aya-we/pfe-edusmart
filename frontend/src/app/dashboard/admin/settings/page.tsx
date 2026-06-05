@@ -21,7 +21,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { Palette } from "lucide-react";
-import { Color } from "color-thief-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -33,6 +32,7 @@ export default function AdminSettingsPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [themeSettings, setThemeSettings] = useState({ primary: "#000000", background: "#ffffff" });
+  const [logoColor, setLogoColor] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSchool = async () => {
@@ -87,10 +87,47 @@ export default function AdminSettingsPage() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSchool({ ...school, logo: reader.result as string });
+        const src = reader.result as string;
+        setSchool({ ...school, logo: src });
+        extractColor(src);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const extractColor = (src: string) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      try {
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < data.length; i += 40) {
+          if (data[i + 3] > 0) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+            count++;
+          }
+        }
+        if (count > 0) {
+          r = Math.floor(r / count);
+          g = Math.floor(g / count);
+          b = Math.floor(b / count);
+          const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+          setLogoColor(hex);
+        }
+      } catch (e) {
+        console.error("Canvas extraction failed", e);
+      }
+    };
+    img.src = src;
   };
 
   if (loading) return (
@@ -210,30 +247,22 @@ export default function AdminSettingsPage() {
               </div>
             </div>
 
-            {school?.logo && (
+            {school?.logo && logoColor && (
               <div className="space-y-4 pt-6 border-t border-border/50">
                 <label className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Suggestions depuis le Logo</label>
-                <Color src={school.logo} crossOrigin="anonymous" format="hex">
-                  {({ data, loading }) => {
-                    if (loading) return <p className="text-sm text-muted-foreground">Extraction des couleurs...</p>;
-                    if (!data) return <p className="text-sm text-muted-foreground">Impossible d'extraire la couleur.</p>;
-                    return (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-xs text-muted-foreground">Nous avons détecté cette couleur dominante dans votre logo :</p>
-                        <div className="flex items-center gap-4">
-                          <button
-                            type="button"
-                            onClick={() => setThemeSettings({ ...themeSettings, primary: data })}
-                            className="w-12 h-12 rounded-full shadow-md hover:scale-110 transition-transform"
-                            style={{ backgroundColor: data }}
-                            title="Utiliser comme couleur primaire"
-                          />
-                          <span className="font-mono text-sm">{data}</span>
-                        </div>
-                      </div>
-                    );
-                  }}
-                </Color>
+                <div className="flex flex-col gap-3">
+                  <p className="text-xs text-muted-foreground">Nous avons détecté cette couleur dominante dans votre logo :</p>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setThemeSettings({ ...themeSettings, primary: logoColor })}
+                      className="w-12 h-12 rounded-full shadow-md hover:scale-110 transition-transform"
+                      style={{ backgroundColor: logoColor }}
+                      title="Utiliser comme couleur primaire"
+                    />
+                    <span className="font-mono text-sm">{logoColor}</span>
+                  </div>
+                </div>
               </div>
             )}
           </CardContent>
