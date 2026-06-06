@@ -26,6 +26,7 @@ export default function AdminSchedulePage() {
   const [success, setSuccess] = useState(false);
   const [period, setPeriod] = useState("Standard");
   const [availablePeriods, setAvailablePeriods] = useState<string[]>([]);
+  const [isCustomPeriod, setIsCustomPeriod] = useState(false);
 
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
@@ -150,24 +151,50 @@ export default function AdminSchedulePage() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <input 
-            type="text"
-            list="period-options"
-            placeholder="Nom de la période..."
-            value={period} 
-            onChange={(e) => setPeriod(e.target.value)}
-            className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-          />
-          <datalist id="period-options">
-            {availablePeriods.map(p => (
-              <option key={p} value={p} />
-            ))}
-            {!availablePeriods.includes("Standard") && <option value="Standard" />}
-            <option value="Semestre 1" />
-            <option value="Semestre 2" />
-            <option value="Ramadan" />
-            <option value="Été" />
-          </datalist>
+          {isCustomPeriod ? (
+            <div className="flex items-center gap-2">
+              <input 
+                type="text"
+                placeholder="Nom de la période..."
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)}
+                className="rounded-xl h-12 px-4 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+                autoFocus
+              />
+              <button 
+                onClick={() => {
+                  setIsCustomPeriod(false);
+                  if (!period) setPeriod("Standard");
+                }}
+                className="text-xs text-muted-foreground underline hover:text-foreground"
+              >
+                Annuler
+              </button>
+            </div>
+          ) : (
+            <select
+              value={period}
+              onChange={(e) => {
+                if (e.target.value === "__CUSTOM__") {
+                  setIsCustomPeriod(true);
+                  setPeriod("");
+                } else {
+                  setPeriod(e.target.value);
+                }
+              }}
+              className="rounded-xl h-12 px-4 pr-10 border border-border bg-background font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary shadow-sm appearance-none"
+            >
+              {availablePeriods.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+              {!availablePeriods.includes("Standard") && <option value="Standard">Standard</option>}
+              {!availablePeriods.includes("Semestre 1") && <option value="Semestre 1">Semestre 1</option>}
+              {!availablePeriods.includes("Semestre 2") && <option value="Semestre 2">Semestre 2</option>}
+              {!availablePeriods.includes("Ramadan") && <option value="Ramadan">Ramadan</option>}
+              {!availablePeriods.includes("Été") && <option value="Été">Été</option>}
+              <option value="__CUSTOM__">+ Autre période...</option>
+            </select>
+          )}
           <Button 
             onClick={handleSave} 
             disabled={saving}
