@@ -17,6 +17,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, pass: string) => Promise<void>;
+  registerSchool: (data: any) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
   schoolLogo: string | null;
@@ -108,6 +109,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const registerSchool = async (data: any) => {
+    try {
+      const response = await axios.post(`${API}/auth/register`, {
+        ...data,
+        role: "ADMIN"
+      });
+      // After registering, we can auto-login the user
+      await login(data.email, data.password);
+    } catch (error) {
+      console.error("Registration failed", error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -117,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading, schoolLogo }}>
+    <AuthContext.Provider value={{ user, token, login, registerSchool, logout, isLoading, schoolLogo }}>
       {children}
     </AuthContext.Provider>
   );

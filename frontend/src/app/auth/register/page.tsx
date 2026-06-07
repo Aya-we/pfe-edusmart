@@ -8,7 +8,6 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -22,7 +21,7 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { registerSchool } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,15 +29,7 @@ export default function RegisterPage() {
     setError("");
     
     try {
-      // 1. Register the admin and the school
-      await axios.post(`${API}/auth/register`, {
-        ...formData,
-        role: "ADMIN",
-        schoolId: "temp-school-id" // This will be ignored by backend since we pass schoolName
-      });
-
-      // 2. Automatically log them in
-      await login(formData.email, formData.password);
+      await registerSchool(formData);
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Erreur lors de l'inscription.";
       setError(typeof msg === "string" ? msg : JSON.stringify(msg));

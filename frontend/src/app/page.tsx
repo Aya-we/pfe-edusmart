@@ -34,6 +34,7 @@ export default function LandingPage() {
         
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link href="#features" className="hover:text-foreground transition-colors">Solutions</Link>
+          <Link href="#about" className="hover:text-foreground transition-colors">À propos</Link>
           <Link href="#contact" className="hover:text-foreground transition-colors">Contact</Link>
         </div>
 
@@ -41,7 +42,7 @@ export default function LandingPage() {
           <Link href="/auth/login">
             <Button variant="ghost" className="text-sm font-medium">Connexion</Button>
           </Link>
-          <Link href="/auth/login">
+          <Link href="/auth/register">
             <Button className="text-sm font-medium rounded-full px-6">S'inscrire</Button>
           </Link>
         </div>
@@ -49,7 +50,7 @@ export default function LandingPage() {
 
       <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-32 px-6 min-h-[80vh] flex items-center">
+        <section className="relative overflow-hidden pt-20 pb-32 px-6 min-h-[80vh] flex items-center" id="about">
           <div className="absolute inset-0 -z-20">
             <img src="/hero_bg_light.png" alt="Educational Background" className="w-full h-full object-cover opacity-20 dark:opacity-10" />
           </div>
