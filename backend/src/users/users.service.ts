@@ -212,4 +212,40 @@ export class UsersService {
       }))
     };
   }
+
+  async getPasswordResetRequests(schoolId: string) {
+    return this.prisma.passwordResetRequest.findMany({
+      where: {
+        user: { schoolId }
+      },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, role: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async resolvePasswordReset(requestId: string, newPassword?: string) {
+    const request = await this.prisma.passwordResetRequest.findUnique({
+      where: { id: requestId },
+      include: { user: true }
+    });
+
+    if (!request) throw new Error("Requête non trouvée");
+
+    if (newPassword) {
+      const bcrypt = require('bcrypt');
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      await this.prisma.user.update({
+        where: { id: request.userId },
+        data: { password: hashedPassword }
+      });
+    }
+
+    return this.prisma.passwordResetRequest.delete({
+      where: { id: requestId }
+    });
+  }
 }

@@ -5,7 +5,10 @@ import { cn } from "@/lib/utils";
 import { 
   Users, GraduationCap, School, 
   Loader2, BookOpen,
-  ArrowRight
+  ArrowRight,
+  ShieldAlert,
+  KeyRound,
+  Check
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -28,18 +31,23 @@ export default function AdminDashboard() {
   });
   const [recentUsers, setRecentUsers]   = useState<any[]>([]);
   const [recentClasses, setRecentClasses] = useState<any[]>([]);
+  const [resetRequests, setResetRequests] = useState<any[]>([]);
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [newPasswordInput, setNewPasswordInput] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [usersRes, classesRes] = await Promise.all([
+        const [usersRes, classesRes, resetRes] = await Promise.all([
           axios.get(`${API}/users?schoolId=${currentUser?.schoolId}`),
           axios.get(`${API}/classes?schoolId=${currentUser?.schoolId}`),
+          axios.get(`${API}/users/password-reset-requests?schoolId=${currentUser?.schoolId}`),
         ]);
 
         const users   = usersRes.data  as any[];
         const classes = classesRes.data as any[];
+        setResetRequests(resetRes.data as any[]);
 
         setStats({
           students: users.filter(u => u.role === "STUDENT").length,
@@ -69,6 +77,21 @@ export default function AdminDashboard() {
     </div>
   );
 
+  const handleResolveRequest = async (requestId: string) => {
+    setResolvingId(requestId);
+    try {
+      await axios.post(`${API}/users/password-reset-requests/${requestId}/resolve`, {
+        newPassword: newPasswordInput[requestId] || "12345678" // Default if empty
+      });
+      setResetRequests(prev => prev.filter(r => r.id !== requestId));
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la réinitialisation");
+    } finally {
+      setResolvingId(null);
+    }
+  };
+
   const cards = [
     { label: "Total Étudiants",  value: stats.students, icon: GraduationCap, color: "bg-blue-500/10 text-blue-600" },
     { label: "Corps Enseignant", value: stats.teachers,  icon: Users,         color: "bg-purple-500/10 text-purple-600" },
@@ -89,6 +112,42 @@ export default function AdminDashboard() {
         <h1 className="text-4xl font-bold tracking-tight">Vue d'ensemble</h1>
         <p className="text-muted-foreground text-lg">Données consolidées de l'établissement en temps réel.</p>
       </div>
+
+      {resetRequests.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 rounded-3xl border border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-900">
+          <div className="flex items-center gap-3 mb-4 text-orange-600 dark:text-orange-400">
+            <ShieldAlert className="w-6 h-6" />
+            <h3 className="font-bold text-lg">Demandes de réinitialisation de mot de passe ({resetRequests.length})</h3>
+          </div>
+          <div className="space-y-3">
+            {resetRequests.map(req => (
+              <div key={req.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-background border border-orange-100 dark:border-orange-900/50">
+                <div>
+                  <p className="font-bold">{req.user?.firstName} {req.user?.lastName} <span className="text-xs text-muted-foreground font-normal ml-2">({req.user?.email})</span></p>
+                  <p className="text-xs text-muted-foreground">Rôle: {ROLE_LABELS[req.user?.role] || req.user?.role} • Date: {formatDate(req.createdAt)}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="Nouveau mot de passe..." 
+                    className="h-9 rounded-lg px-3 text-sm border border-border"
+                    value={newPasswordInput[req.id] || ""}
+                    onChange={e => setNewPasswordInput({...newPasswordInput, [req.id]: e.target.value})}
+                  />
+                  <button 
+                    disabled={resolvingId === req.id}
+                    onClick={() => handleResolveRequest(req.id)}
+                    className="h-9 px-4 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {resolvingId === req.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <KeyRound className="w-4 h-4" />}
+                    Valider
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

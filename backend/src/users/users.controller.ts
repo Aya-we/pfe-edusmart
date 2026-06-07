@@ -14,6 +14,20 @@ export class UsersController {
     }
   }
 
+  @Get('password-reset-requests')
+  getPasswordResetRequests(@Query('schoolId') schoolId: string) {
+    return this.usersService.getPasswordResetRequests(schoolId);
+  }
+
+  @Post('password-reset-requests/:id/resolve')
+  async resolvePasswordReset(@Param('id') id: string, @Body() body: { newPassword?: string }) {
+    try {
+      return await this.usersService.resolvePasswordReset(id, body.newPassword);
+    } catch (error: any) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
