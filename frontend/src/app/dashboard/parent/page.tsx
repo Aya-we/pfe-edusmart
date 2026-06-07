@@ -57,7 +57,7 @@ export default function ParentDashboard() {
           } catch {}
 
           const avgGeneral = grades.length > 0
-            ? (grades.reduce((s: number, g: any) => s + (g.average || 0), 0) / grades.length).toFixed(2)
+            ? (grades.reduce((s: number, g: any) => s + Number(g.average || 0), 0) / grades.length).toFixed(2)
             : "—";
           const absenceCount   = Array.isArray(attendances) ? attendances.filter((a: any) => a.status === "ABSENT").length : 0;
           const presenceRate   = (Array.isArray(attendances) && attendances.length > 0)
@@ -184,9 +184,9 @@ export default function ParentDashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {activeChild.grades.slice(0, 3).map((g: any, i: number) => (
                       <div key={i} className="p-5 rounded-2xl border border-border bg-background hover:border-foreground/20 transition-all">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{g.subjectName ?? "Matière"}</p>
-                        <p className={`text-2xl font-black mb-00.5 ${(g.average ?? 0) >= 10 ? "text-green-600" : "text-red-500"}`}>
-                          {(g.average ?? 0).toFixed(1)}
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">{g.subject ?? "Matière"}</p>
+                        <p className={`text-2xl font-black mb-00.5 ${Number(g.average ?? 0) >= 10 ? "text-green-600" : "text-red-500"}`}>
+                          {Number(g.average ?? 0).toFixed(1)}
                         </p>
                         <p className="text-xs text-muted-foreground">/20</p>
                       </div>
@@ -207,7 +207,9 @@ export default function ParentDashboard() {
                           <div>
                             <p className="text-sm font-bold">{a.subject?.name ?? "Séance"}</p>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(a.date ?? a.createdAt).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+                              {(a.date || a.createdAt) 
+                                ? new Date(a.date ?? a.createdAt).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
+                                : "Date inconnue"}
                             </p>
                           </div>
                         </div>
