@@ -52,7 +52,7 @@ export default function LandingPage() {
         {/* Hero Section */}
         <section className="relative overflow-hidden pt-20 pb-32 px-6 min-h-[80vh] flex items-center">
           <div className="absolute inset-0 -z-20">
-            <img src="/hero_bg.png" alt="Educational Background" className="w-full h-full object-cover opacity-10 dark:opacity-5" />
+            <img src="/hero_bg_light.png" alt="Educational Background" className="w-full h-full object-cover opacity-20 dark:opacity-10" />
           </div>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden pointer-events-none">
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
@@ -67,21 +67,21 @@ export default function LandingPage() {
           >
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-xs font-semibold mb-6">
               <span className="bg-primary text-primary-foreground px-2 py-00.5 rounded-full text-[10px]">NOUVEAU</span>
-              <span>L'intelligence artificielle au service de l'éducation</span>
+              <span>La nouvelle norme de l'excellence éducative</span>
             </motion.div>
             
             <motion.h1 
               variants={itemVariants}
               className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70"
             >
-              Le futur de la gestion <br /> scolaire au Maroc.
+              L'Éducation Repensée, <br /> La Gestion Simplifiée.
             </motion.h1>
 
             <motion.p 
               variants={itemVariants}
               className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
             >
-              Une plateforme tout-en-un, moderne et intuitive conçue pour les écoles privées, lycées et universités. Simplifiez votre quotidien administratif.
+              Une expérience fluide et moderne pour piloter votre établissement. De la gestion des absences aux bulletins scolaires, tout devient plus facile avec EduSmart.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
