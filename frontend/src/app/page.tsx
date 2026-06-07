@@ -29,7 +29,7 @@ export default function LandingPage() {
           <div className="bg-primary text-primary-foreground p-2 rounded-lg">
             <GraduationCap className="w-5 h-5" />
           </div>
-          <span className="font-bold text-xl tracking-tight">EduSmart</span>
+          <span className="font-bold text-lg sm:text-xl tracking-tight hidden xs:block sm:block">EduSmart</span>
         </div>
         
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
@@ -38,12 +38,12 @@ export default function LandingPage() {
           <Link href="#contact" className="hover:text-foreground transition-colors">Contact</Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <Link href="/auth/login">
-            <Button variant="ghost" className="text-sm font-medium">Connexion</Button>
+            <Button variant="ghost" className="text-xs sm:text-sm font-medium px-2 sm:px-4">Connexion</Button>
           </Link>
           <Link href="/auth/register">
-            <Button className="text-sm font-medium rounded-full px-6">S'inscrire</Button>
+            <Button className="text-xs sm:text-sm font-medium rounded-full px-4 sm:px-6">S'inscrire</Button>
           </Link>
         </div>
       </nav>
@@ -72,9 +72,9 @@ export default function LandingPage() {
             
             <motion.h1 
               variants={itemVariants}
-              className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70"
+              className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70"
             >
-              L'Éducation Repensée, <br /> La Gestion Simplifiée.
+              L'Éducation Repensée, <br className="hidden sm:block" /> La Gestion Simplifiée.
             </motion.h1>
 
             <motion.p 
@@ -84,15 +84,15 @@ export default function LandingPage() {
               Une expérience fluide et moderne pour piloter votre établissement. De la gestion des absences aux bulletins scolaires, tout devient plus facile avec EduSmart.
             </motion.p>
 
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth/login">
-                <Button size="lg" className="rounded-full px-8 h-12 text-base group">
+            <motion.div variants={itemVariants} className="flex flex-col w-full sm:w-auto sm:flex-row items-center justify-center gap-4">
+              <Link href="/auth/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto rounded-full px-8 h-12 text-base group">
                   Commencer maintenant
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/auth/login">
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-12 text-base">
+              <Link href="/auth/login" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full px-8 h-12 text-base">
                   Se connecter
                 </Button>
               </Link>
