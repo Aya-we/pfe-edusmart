@@ -60,9 +60,9 @@ export default function ForgotPasswordPage() {
               <p className="text-sm text-muted-foreground">
                 Si un compte est associé à cette adresse e-mail, votre administrateur sera notifié de votre demande de réinitialisation.
               </p>
-              <Button asChild className="w-full mt-4 rounded-xl">
-                <Link href="/auth/login">Retourner à la connexion</Link>
-              </Button>
+              <Link href="/auth/login" className="w-full mt-4 inline-block">
+                <Button className="w-full rounded-xl">Retourner à la connexion</Button>
+              </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
