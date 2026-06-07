@@ -53,6 +53,7 @@ model User {
 
   sentMessages     Message[] @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
+  passwordResetRequests PasswordResetRequest[]
 }
 
 model Teacher {
@@ -238,4 +239,12 @@ model TeacherSubject {
   subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@unique([teacherId, subjectId])
+}
+
+model PasswordResetRequest {
+  id        String   @id @default(uuid())
+  userId    String   @db.VarChar(100)
+  user      User     @relation(fields: [userId], references: [id])
+  status    String   @default("PENDING") @db.VarChar(50)
+  createdAt DateTime @default(now())
 }

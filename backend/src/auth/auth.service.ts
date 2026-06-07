@@ -92,4 +92,20 @@ export class AuthService {
       }
     };
   }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      // Pour des raisons de sécurité, on ne renvoie pas d'erreur si l'email n'existe pas.
+      return { message: 'Si un compte correspond à cette adresse, une demande a été envoyée à l\'administrateur.' };
+    }
+
+    await this.prisma.passwordResetRequest.create({
+      data: {
+        userId: user.id,
+      },
+    });
+
+    return { message: 'Si un compte correspond à cette adresse, une demande a été envoyée à l\'administrateur.' };
+  }
 }
