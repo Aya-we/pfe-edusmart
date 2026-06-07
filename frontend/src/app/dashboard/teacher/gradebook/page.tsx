@@ -31,7 +31,7 @@ export default function GradebookPage() {
       try {
         const [cRes, sRes] = await Promise.all([
           axios.get(`${API}/classes/teacher/${user?.id}`),
-          axios.get(`${API}/subjects?schoolId=${user?.schoolId}`),
+          axios.get(`${API}/subjects/teacher/${user?.id}`),
         ]);
         setClasses(cRes.data);
         setSubjects(sRes.data);

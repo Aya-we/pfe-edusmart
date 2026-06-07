@@ -10,6 +10,11 @@ export class SubjectsController {
     return this.subjectsService.findAll(schoolId);
   }
 
+  @Get('teacher/:teacherId')
+  findByTeacher(@Param('teacherId') teacherId: string) {
+    return this.subjectsService.findByTeacher(teacherId);
+  }
+
   @Post()
   create(@Body() data: any) {
     return this.subjectsService.create(data);

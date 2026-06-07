@@ -12,6 +12,14 @@ export class SubjectsService {
     });
   }
 
+  async findByTeacher(teacherId: string) {
+    const ts = await this.prisma.teacherSubject.findMany({
+      where: { teacher: { userId: teacherId } },
+      include: { subject: true }
+    });
+    return ts.map(t => t.subject);
+  }
+
   async create(data: { name: string; schoolId: string }) {
     return this.prisma.subject.create({ data });
   }
