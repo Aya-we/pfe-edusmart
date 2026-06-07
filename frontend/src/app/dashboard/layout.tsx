@@ -4,7 +4,7 @@ import { ReactNode, useState, useEffect, useRef } from "react";
 import { 
   LayoutDashboard, GraduationCap, Calendar,
   ClipboardCheck, MessageSquare, Settings, Sparkles,
-  LogOut, Search, Bell, Users, BookOpen, X, Check
+  LogOut, Search, Bell, Users, BookOpen, X, Check, Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -60,6 +60,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [notifOpen,    setNotifOpen]    = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount,  setUnreadCount]  = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   // Fermer le panel si click à l'extérieur
@@ -124,16 +125,27 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen bg-muted/20">
+    <div className="flex h-screen bg-muted/20 overflow-hidden relative">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-56 border-r border-border bg-background flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-border">
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-64 border-r border-border bg-background flex flex-col transition-transform duration-300 md:relative md:translate-x-0",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="bg-primary text-primary-foreground p-2 rounded-md shadow-sm">
               <GraduationCap className="w-5 h-5" />
             </div>
             <span className="font-bold text-xl tracking-tight text-foreground">EduSmart</span>
           </div>
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSidebarOpen(false)}>
+            <X className="w-5 h-5" />
+          </Button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -141,6 +153,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setIsSidebarOpen(false)}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                 pathname === item.href
@@ -167,16 +180,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden w-full">
         {/* Top Header */}
-        <header className="h-16 border-b border-border bg-background flex items-center justify-between px-8">
-          <div className="flex items-center bg-muted/50 rounded-xl px-3 py-1.5 w-96">
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Rechercher..."
-              className="bg-transparent border-none outline-none text-sm ml-2 w-full"
-            />
+        <header className="h-16 border-b border-border bg-background flex items-center justify-between px-4 md:px-8">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSidebarOpen(true)}>
+              <Menu className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center bg-muted/50 rounded-xl px-3 py-1.5 w-[150px] sm:w-[250px] md:w-96">
+              <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                className="bg-transparent border-none outline-none text-sm ml-2 w-full"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -283,8 +301,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-8 bg-muted/5">
-          <div className="max-w-6xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-muted/5 w-full">
+          <div className="max-w-6xl mx-auto w-full">
             {children}
           </div>
         </div>
