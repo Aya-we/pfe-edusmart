@@ -49,18 +49,18 @@ export default function ParentDashboard() {
 
           try {
             const gRes = await axios.get(`${API}/grades/averages/${child.userId}`);
-            grades = gRes.data || [];
+            grades = Array.isArray(gRes.data) ? gRes.data : [];
           } catch {}
           try {
             const aRes = await axios.get(`${API}/attendance/${child.userId}`);
-            attendances = aRes.data || [];
+            attendances = Array.isArray(aRes.data) ? aRes.data : [];
           } catch {}
 
           const avgGeneral = grades.length > 0
             ? (grades.reduce((s: number, g: any) => s + (g.average || 0), 0) / grades.length).toFixed(2)
             : "—";
-          const absenceCount   = attendances.filter((a: any) => a.status === "ABSENT").length;
-          const presenceRate   = attendances.length > 0
+          const absenceCount   = Array.isArray(attendances) ? attendances.filter((a: any) => a.status === "ABSENT").length : 0;
+          const presenceRate   = (Array.isArray(attendances) && attendances.length > 0)
             ? Math.round(((attendances.length - absenceCount) / attendances.length) * 100)
             : 100;
 
@@ -124,7 +124,7 @@ export default function ParentDashboard() {
                       ? "bg-primary text-primary-foreground border-foreground"
                       : "border-border text-muted-foreground hover:border-foreground/30"
                   }`}>
-                  {child.user.firstName} {child.user.lastName}
+                  {child.user?.firstName} {child.user?.lastName}
                 </button>
               ))}
             </div>
@@ -138,12 +138,12 @@ export default function ParentDashboard() {
               <Card className="rounded-3xl border border-border bg-background shadow-sm overflow-hidden">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-5 mb-8">
-                    <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-black text-xl">
-                      {activeChild.user.firstName[0]}{activeChild.user.lastName[0]}
+                    <div className="w-16 h-16 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-black text-xl uppercase">
+                      {activeChild.user?.firstName?.[0] || ""}{activeChild.user?.lastName?.[0] || ""}
                     </div>
                     <div>
                       <h3 className="text-2xl font-black tracking-tight">
-                        {activeChild.user.firstName} {activeChild.user.lastName}
+                        {activeChild.user?.firstName} {activeChild.user?.lastName}
                       </h3>
                       <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mt-00.5">
                         {activeChild.class?.name ?? "—"}
@@ -178,7 +178,7 @@ export default function ParentDashboard() {
               </Card>
 
               {/* Notes récentes */}
-              {activeChild.grades.length > 0 && (
+              {Array.isArray(activeChild.grades) && activeChild.grades.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">Dernières moyennes</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -196,7 +196,7 @@ export default function ParentDashboard() {
               )}
 
               {/* Absences récentes */}
-              {activeChild.attendances.filter((a: any) => a.status === "ABSENT").length > 0 && (
+              {Array.isArray(activeChild.attendances) && activeChild.attendances.filter((a: any) => a.status === "ABSENT").length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">Dernières absences</h3>
                   <div className="border border-border rounded-xl overflow-hidden bg-background">
