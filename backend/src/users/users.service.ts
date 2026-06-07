@@ -142,7 +142,49 @@ export class UsersService {
     return user;
   }
   async delete(id: string) {
-    // Delete profile first to avoid FK constraints if necessary (depending on schema)
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) return null;
+
+    // 1. Delete messages (sent and received)
+    await this.prisma.message.deleteMany({
+      where: { OR: [{ senderId: id }, { receiverId: id }] }
+    });
+
+    // 2. Delete password reset requests
+    await this.prisma.passwordResetRequest.deleteMany({
+      where: { userId: id }
+    });
+
+    // 3. Delete role specific records
+    if (user.role === 'STUDENT') {
+      const student = await this.prisma.student.findUnique({ where: { userId: id } });
+      if (student) {
+        await this.prisma.grade.deleteMany({ where: { studentId: student.id } });
+        await this.prisma.attendance.deleteMany({ where: { studentId: student.id } });
+        await this.prisma.student.delete({ where: { id: student.id } });
+      }
+    } else if (user.role === 'TEACHER') {
+      const teacher = await this.prisma.teacher.findUnique({ where: { userId: id } });
+      if (teacher) {
+        await this.prisma.teacherClass.deleteMany({ where: { teacherId: teacher.id } });
+        await this.prisma.teacherSubject.deleteMany({ where: { teacherId: teacher.id } });
+        await this.prisma.timetable.deleteMany({ where: { teacherId: teacher.id } });
+        await this.prisma.resource.deleteMany({ where: { teacherId: teacher.id } });
+        await this.prisma.teacherAbsence.deleteMany({ where: { teacherId: teacher.id } });
+        await this.prisma.teacher.delete({ where: { id: teacher.id } });
+      }
+    } else if (user.role === 'PARENT') {
+      const parent = await this.prisma.parent.findUnique({ where: { userId: id } });
+      if (parent) {
+        await this.prisma.student.updateMany({
+          where: { parentId: parent.id },
+          data: { parentId: null }
+        });
+        await this.prisma.parent.delete({ where: { id: parent.id } });
+      }
+    }
+
+    // Finally delete user
     return this.prisma.user.delete({
       where: { id },
     });
