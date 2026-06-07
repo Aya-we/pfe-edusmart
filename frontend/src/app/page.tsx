@@ -50,8 +50,11 @@ export default function LandingPage() {
 
       <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 pb-32 px-6">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden">
+        <section className="relative overflow-hidden pt-20 pb-32 px-6 min-h-[80vh] flex items-center">
+          <div className="absolute inset-0 -z-20">
+            <img src="/hero_bg.png" alt="Educational Background" className="w-full h-full object-cover opacity-10 dark:opacity-5" />
+          </div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden pointer-events-none">
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
             <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
           </div>
