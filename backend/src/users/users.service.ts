@@ -71,7 +71,7 @@ export class UsersService {
   }
 
   async update(id: string, data: any) {
-    const { classId, teacherClasses, teacherSubjects, parentId, ...userData } = data;
+    const { classId, teacherClasses, teacherSubjects, parentId, studentIds, ...userData } = data;
 
     // 1. Update User basic info
     const user = await this.prisma.user.update({
@@ -132,11 +132,23 @@ export class UsersService {
     }
     // 4. Update Parent
     if (user.role === 'PARENT') {
-      await this.prisma.parent.upsert({
+      const parent = await this.prisma.parent.upsert({
         where: { userId: id },
         update: {},
         create: { userId: id }
       });
+      if (studentIds !== undefined) {
+         await this.prisma.student.updateMany({
+           where: { parentId: parent.id },
+           data: { parentId: null }
+         });
+         if (studentIds.length > 0) {
+           await this.prisma.student.updateMany({
+             where: { id: { in: studentIds } },
+             data: { parentId: parent.id }
+           });
+         }
+      }
     }
 
     return user;

@@ -70,9 +70,15 @@ export class AuthService {
         },
       });
     } else if (data.role === 'PARENT') {
-      await this.prisma.parent.create({
+      const parent = await this.prisma.parent.create({
         data: { userId: user.id },
       });
+      if (data.studentIds && data.studentIds.length > 0) {
+        await this.prisma.student.updateMany({
+          where: { id: { in: data.studentIds } },
+          data: { parentId: parent.id }
+        });
+      }
     }
 
     return user;

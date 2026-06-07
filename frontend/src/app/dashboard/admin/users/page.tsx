@@ -27,6 +27,7 @@ export default function UsersManagementPage() {
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [parents, setParents] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal,      setShowModal]      = useState(false);
   const [isEditing,      setIsEditing]      = useState(false);
@@ -37,6 +38,7 @@ export default function UsersManagementPage() {
     password: "", role: "STUDENT",
     classId: "",
     parentId: "",               // 🆕 parent d l'étudiant
+    studentIds: [] as string[], // 🆕 étudiants assignés au parent
     teacherClasses: [] as string[],
     teacherSubjects: [] as string[],
   });
@@ -69,6 +71,7 @@ export default function UsersManagementPage() {
         setUsers(allUsers);
         setParents(allUsers.filter((u: any) => u.role === "PARENT"));
         setTeachers(allUsers.filter((u: any) => u.role === "TEACHER" && u.teacher));
+        setStudents(allUsers.filter((u: any) => u.role === "STUDENT" && u.student));
       } catch (err) {
         console.error("Failed to fetch users:", err);
       }
@@ -93,6 +96,7 @@ export default function UsersManagementPage() {
       password:  "",
       classId:   user.student?.classId || (classes[0]?.id ?? ""),
       parentId:  user.student?.parentId || "",      // 🆕
+      studentIds: user.parent?.students?.map((s: any) => s.id) || [], // 🆕
       teacherClasses: user.teacher?.classes?.map((c: any) => c.id) || [],
       teacherSubjects: user.teacher?.subjects?.map((s: any) => s.id) || [],
     });
@@ -106,7 +110,7 @@ export default function UsersManagementPage() {
     setFormData({
       firstName: "", lastName: "", email: "", password: "",
       role: "STUDENT", classId: classes[0]?.id ?? "",
-      parentId: "", teacherClasses: [], teacherSubjects: []
+      parentId: "", studentIds: [], teacherClasses: [], teacherSubjects: []
     });
   };
 
@@ -165,6 +169,7 @@ export default function UsersManagementPage() {
           role:           formData.role,
           classId:        formData.classId,
           parentId:       formData.parentId || null,    // 🆕
+          studentIds:     formData.studentIds,          // 🆕
           teacherClasses: formData.teacherClasses,
           teacherSubjects: formData.teacherSubjects,
         });
@@ -255,7 +260,12 @@ export default function UsersManagementPage() {
                       <span><span className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mr-1">Matières:</span> {u.teacher?.subjects?.map((s: any) => s.name)?.join(", ") || "—"}</span>
                     </div>
                   )}
-                  {(u.role === "ADMIN" || u.role === "PARENT") && "—"}
+                  {u.role === "PARENT" && (
+                    <div className="flex flex-col gap-1">
+                      <span><span className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mr-1">Enfants:</span> {u.parent?.students?.map((s: any) => s.user?.firstName + ' ' + s.user?.lastName)?.join(", ") || "—"}</span>
+                    </div>
+                  )}
+                  {u.role === "ADMIN" && "—"}
                 </TableCell>
                 <TableCell className="text-right pr-6">
                   <div className="flex justify-end gap-2">
@@ -399,6 +409,34 @@ export default function UsersManagementPage() {
                       })}
                     </div>
                     <p className="text-xs text-muted-foreground">{formData.teacherSubjects.length} matière(s) sélectionnée(s)</p>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Champs PARENT ── */}
+              {formData.role === "PARENT" && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Enfants (Étudiants) assignés</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-4 rounded-xl border border-border bg-muted/5 max-h-48 overflow-y-auto">
+                      {students.length === 0 && <p className="col-span-full text-xs text-muted-foreground text-center py-2">Aucun étudiant disponible</p>}
+                      {students.map(s => (
+                        <label key={s.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted transition-all">
+                          <input type="checkbox" checked={formData.studentIds.includes(s.student?.id)}
+                            onChange={() => {
+                              const sid = s.student?.id;
+                              if(!sid) return;
+                              setFormData(p => ({
+                                ...p,
+                                studentIds: p.studentIds.includes(sid) ? p.studentIds.filter(x => x !== sid) : [...p.studentIds, sid]
+                              }))
+                            }}
+                            className="accent-foreground w-4 h-4 rounded" />
+                          <span className="text-sm font-medium">{s.firstName} {s.lastName}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{formData.studentIds.length} enfant(s) sélectionné(s)</p>
                   </div>
                 </div>
               )}
