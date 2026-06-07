@@ -42,8 +42,8 @@ export default function LandingPage() {
           <Link href="/auth/login">
             <Button variant="ghost" className="text-sm font-medium">Connexion</Button>
           </Link>
-          <Link href="/auth/login">
-            <Button className="text-sm font-medium rounded-full px-6">Démonstration</Button>
+          <Link href="#about">
+            <Button className="text-sm font-medium rounded-full px-6">À propos de nous</Button>
           </Link>
         </div>
       </nav>
@@ -100,8 +100,8 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        {/* Features Preview */}
-        <section className="py-24 bg-muted/30 px-6 border-y border-border/50" id="features">
+        {/* About / Features Preview */}
+        <section className="py-24 bg-muted/30 px-6 border-y border-border/50" id="about">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
