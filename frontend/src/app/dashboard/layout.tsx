@@ -42,6 +42,7 @@ const adminItems = [
   { icon: Calendar,        label: "Emploi du temps",   href: "/dashboard/admin/schedule" },
   { icon: ClipboardCheck,  label: "Justifications",    href: "/dashboard/admin/absences" },
   { icon: BookOpen,        label: "Bibliothèque",      href: "/dashboard/library" },
+  { icon: MessageSquare,   label: "Messagerie",        href: "/dashboard/messages" },
   { icon: Settings,        label: "Configuration",     href: "/dashboard/admin/settings" },
 ];
 
