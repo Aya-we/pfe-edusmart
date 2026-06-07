@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { UserPlus, Trash2, Edit2, X, Loader2 } from "lucide-react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/lib/utils";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -22,6 +23,7 @@ const ROLE_COLORS: Record<string, string> = {
 export default function UsersManagementPage() {
   const { user: currentUser } = useAuth();
   const [users,   setUsers]   = useState<any[]>([]);
+  const [teachers, setTeachers] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [parents, setParents] = useState<any[]>([]);
@@ -63,8 +65,10 @@ export default function UsersManagementPage() {
       // Fetch users
       try {
         const uRes = await axios.get(`${API}/users?schoolId=${currentUser?.schoolId}`);
-        setUsers(uRes.data);
-        setParents(uRes.data.filter((u: any) => u.role === "PARENT"));
+        const allUsers = uRes.data;
+        setUsers(allUsers);
+        setParents(allUsers.filter((u: any) => u.role === "PARENT"));
+        setTeachers(allUsers.filter((u: any) => u.role === "TEACHER" && u.teacher));
       } catch (err) {
         console.error("Failed to fetch users:", err);
       }
@@ -123,6 +127,31 @@ export default function UsersManagementPage() {
         : [...p.teacherSubjects, sid],
     }));
   };
+
+  // Calcul des matières indisponibles selon les classes sélectionnées
+  const getUnavailableSubjects = () => {
+    if (formData.role !== "TEACHER") return new Set();
+    const unavailable = new Set<string>();
+    
+    // Pour chaque classe sélectionnée par le prof actuel
+    for (const classId of formData.teacherClasses) {
+      // Chercher les autres profs qui ont cette classe
+      for (const t of teachers) {
+        if (selectedUserId && t.id === selectedUserId) continue; // Ignorer le prof en cours d'édition
+        
+        const teachesThisClass = t.teacher?.classes?.some((c: any) => c.id === classId);
+        if (teachesThisClass) {
+          // Ce prof enseigne à cette classe, donc toutes ses matières sont "prises" pour cette classe
+          t.teacher?.subjects?.forEach((s: any) => {
+            unavailable.add(s.id);
+          });
+        }
+      }
+    }
+    return unavailable;
+  };
+
+  const unavailableSubjects = getUnavailableSubjects();
 
   /* ─── Submit ─── */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -352,14 +381,22 @@ export default function UsersManagementPage() {
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Matières assignées</label>
                     <div className="grid grid-cols-2 gap-2 p-4 rounded-xl border border-border bg-muted/5 max-h-48 overflow-y-auto">
                       {subjects.length === 0 && <p className="col-span-2 text-xs text-muted-foreground text-center py-2">Aucune matière disponible</p>}
-                      {subjects.map(s => (
-                        <label key={s.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted transition-all">
-                          <input type="checkbox" checked={formData.teacherSubjects.includes(s.id)}
-                            onChange={() => toggleTeacherSubject(s.id)}
-                            className="accent-foreground w-4 h-4 rounded" />
-                          <span className="text-sm font-medium">{s.name}</span>
-                        </label>
-                      ))}
+                      {subjects.map(s => {
+                        const isUnavailable = unavailableSubjects.has(s.id);
+                        return (
+                          <label key={s.id} className={cn("flex items-center gap-2 p-2 rounded-lg transition-all", isUnavailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-muted")}>
+                            <input type="checkbox" 
+                              checked={formData.teacherSubjects.includes(s.id)}
+                              disabled={isUnavailable}
+                              onChange={() => toggleTeacherSubject(s.id)}
+                              className="accent-foreground w-4 h-4 rounded disabled:opacity-50" />
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">{s.name}</span>
+                              {isUnavailable && <span className="text-[10px] text-red-500 font-bold leading-none">Déjà pris</span>}
+                            </div>
+                          </label>
+                        );
+                      })}
                     </div>
                     <p className="text-xs text-muted-foreground">{formData.teacherSubjects.length} matière(s) sélectionnée(s)</p>
                   </div>
