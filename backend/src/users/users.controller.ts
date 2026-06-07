@@ -19,6 +19,15 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @Get(':id/teacher-dashboard')
+  async getTeacherDashboard(@Param('id') id: string) {
+    try {
+      return await this.usersService.getTeacherDashboardData(id);
+    } catch (error: any) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: any) {
     try {

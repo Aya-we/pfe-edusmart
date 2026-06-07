@@ -121,4 +121,95 @@ export class UsersService {
       where: { id },
     });
   }
+
+  async getTeacherDashboardData(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        teacher: {
+          include: {
+            teacherClasses: true,
+            teacherSubjects: true,
+          }
+        }
+      }
+    });
+
+    if (!user || !user.teacher) {
+      throw new Error("Professeur non trouvé");
+    }
+
+    const teacher = user.teacher;
+    const classesCount = teacher.teacherClasses.length;
+    const subjectsCount = teacher.teacherSubjects.length;
+
+    // Get today's timetables
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const dayMap: Record<string, string> = {
+      'Monday': 'Lundi',
+      'Tuesday': 'Mardi',
+      'Wednesday': 'Mercredi',
+      'Thursday': 'Jeudi',
+      'Friday': 'Vendredi',
+      'Saturday': 'Samedi',
+      'Sunday': 'Dimanche'
+    };
+    const todayFr = dayMap[today] || 'Lundi';
+
+    const timetables = await this.prisma.timetable.findMany({
+      where: {
+        teacherId: teacher.id,
+        day: todayFr
+      },
+      include: {
+        class: true,
+        subject: true,
+        room: true
+      },
+      orderBy: {
+        startTime: 'asc'
+      }
+    });
+
+    // Calculate hours
+    let totalHours = 0;
+    timetables.forEach(t => {
+      const start = parseInt(t.startTime.split(':')[0]);
+      const end = parseInt(t.endTime.split(':')[0]);
+      totalHours += (end - start);
+    });
+
+    // Count attendances done today
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const attendances = await this.prisma.attendance.groupBy({
+      by: ['timetableId'],
+      where: {
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        timetable: {
+          teacherId: teacher.id
+        }
+      }
+    });
+
+    return {
+      classesCount,
+      subjectsCount,
+      hoursToday: totalHours,
+      attendancesDone: attendances.length,
+      totalTimetablesToday: timetables.length,
+      upcomingCourses: timetables.map(t => ({
+        time: `${t.startTime} - ${t.endTime}`,
+        class: t.class.name,
+        subject: t.subject.name,
+        room: t.room ? t.room.name : 'Non assignée'
+      }))
+    };
+  }
 }
