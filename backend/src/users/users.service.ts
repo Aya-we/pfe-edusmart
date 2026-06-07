@@ -25,7 +25,7 @@ export class UsersService {
             teacherSubjects: { include: { subject: true } }
           } 
         },
-        parent: true,
+        parent: { include: { students: { include: { user: true } } } },
       },
     });
     
