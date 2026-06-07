@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, Send, CheckCheck, Loader2, Users, MessageSquare } from "lucide-react";
+import { Search, Send, CheckCheck, Loader2, Users, MessageSquare, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -112,7 +112,10 @@ export default function MessagesPage() {
     <div className="h-[calc(100vh-160px)] flex border border-border rounded-2xl overflow-hidden bg-background shadow-sm max-w-6xl mx-auto">
       
       {/* ── Sidebar ── */}
-      <div className="w-80 border-r border-border flex flex-col bg-muted/5">
+      <div className={cn(
+        "w-full md:w-80 border-r border-border flex-col bg-muted/5",
+        selected ? "hidden md:flex" : "flex"
+      )}>
         <div className="p-5 border-b border-border bg-background space-y-3">
           <h2 className="text-xl font-bold">Messages</h2>
           <div className="relative">
@@ -194,7 +197,11 @@ export default function MessagesPage() {
       </div>
 
       {/* ── Zone de chat ── */}
-      {!selected ? (
+      <div className={cn(
+        "flex-1 flex-col",
+        !selected ? "hidden md:flex" : "flex"
+      )}>
+        {!selected ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 text-muted-foreground bg-muted/5">
           <div className="p-5 rounded-2xl bg-muted">
             <MessageSquare className="w-10 h-10" />
@@ -208,6 +215,9 @@ export default function MessagesPage() {
         <div className="flex-1 flex flex-col bg-background">
           {/* Chat Header */}
           <div className="p-4 border-b border-border flex items-center gap-3 bg-background">
+            <Button variant="ghost" size="icon" className="md:hidden -ml-2" onClick={() => setSelected(null)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center font-bold text-xs">
               {initials(selected.name)}
             </div>
@@ -268,7 +278,8 @@ export default function MessagesPage() {
             </form>
           </div>
         </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
