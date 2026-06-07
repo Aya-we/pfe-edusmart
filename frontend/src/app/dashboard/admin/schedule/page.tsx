@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Loader2, Save, CalendarDays, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 
@@ -35,6 +36,31 @@ export default function AdminSchedulePage() {
 
   // State structure: schedule[classId][`${day}|${s}-${e}`] = { subjectId, roomId, teacherId }
   const [schedule, setSchedule] = useState<Record<string, Record<string, any>>>({});
+
+  const [activeTab, setActiveTab] = useState("editor");
+  const [stats, setStats] = useState<any[]>([]);
+  const [loadingStats, setLoadingStats] = useState(false);
+
+  const fetchStats = async () => {
+    if (!user?.schoolId || !token) return;
+    setLoadingStats(true);
+    try {
+      const res = await axios.get(`${API}/timetable/stats/hours?schoolId=${user.schoolId}&period=${period}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStats(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "report") {
+      fetchStats();
+    }
+  }, [activeTab, period]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -197,7 +223,7 @@ export default function AdminSchedulePage() {
           )}
           <Button 
             onClick={handleSave} 
-            disabled={saving}
+            disabled={saving || activeTab !== "editor"}
             className="rounded-xl h-12 px-8 font-bold bg-primary text-primary-foreground gap-2 shadow-xl shadow-primary/20"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
@@ -206,7 +232,16 @@ export default function AdminSchedulePage() {
         </div>
       </div>
 
-      <div className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex justify-start mb-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2 rounded-xl h-12 p-1 bg-muted/50 border border-border">
+            <TabsTrigger value="editor" className="rounded-lg h-full font-medium">Éditeur</TabsTrigger>
+            <TabsTrigger value="report" className="rounded-lg h-full font-medium">Rapport des Heures</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="editor" className="mt-0">
+          <div className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-max">
             <thead>
@@ -328,6 +363,51 @@ export default function AdminSchedulePage() {
           </table>
         </div>
       </div>
+      </TabsContent>
+
+      <TabsContent value="report" className="mt-0">
+        <div className="bg-background rounded-2xl border border-border overflow-hidden shadow-sm p-6 min-h-[400px]">
+          <h2 className="text-xl font-bold mb-6">Rapport d'heures enseignées (Par semaine) - {period}</h2>
+          
+          {loadingStats ? (
+            <div className="flex justify-center items-center h-40">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : stats.length === 0 ? (
+            <div className="text-center text-muted-foreground py-10 bg-muted/20 rounded-xl border border-dashed border-border">
+              Aucune donnée d'emploi du temps pour cette période.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted/50 text-muted-foreground">
+                  <tr>
+                    <th className="p-4 font-semibold rounded-tl-xl">Professeur</th>
+                    <th className="p-4 font-semibold">Classe</th>
+                    <th className="p-4 font-semibold">Matière</th>
+                    <th className="p-4 font-semibold text-right rounded-tr-xl">Heures / Semaine</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {stats.map((s, i) => (
+                    <tr key={i} className="hover:bg-muted/20 transition-colors">
+                      <td className="p-4 font-medium">{s.teacherName}</td>
+                      <td className="p-4">{s.className}</td>
+                      <td className="p-4">{s.subjectName}</td>
+                      <td className="p-4 text-right">
+                        <span className="inline-flex items-center justify-center bg-primary/10 text-primary font-bold px-3 py-1 rounded-full">
+                          {s.hoursPerWeek}h
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </TabsContent>
+      </Tabs>
 
       {success && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="fixed bottom-10 right-10 z-50 flex items-center gap-3 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-800 shadow-2xl dark:bg-green-950/30 dark:border-green-900 dark:text-green-400">

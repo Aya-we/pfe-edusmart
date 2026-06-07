@@ -111,4 +111,40 @@ export class TimetableService {
       where: { id },
     });
   }
+
+  async getTeacherHoursStats(schoolId: string, period: string) {
+    const classes = await this.prisma.class.findMany({ where: { schoolId }, select: { id: true } });
+    const classIds = classes.map(c => c.id);
+
+    const timetables = await this.prisma.timetable.findMany({
+      where: { classId: { in: classIds }, period },
+      include: {
+        teacher: { include: { user: true } },
+        class: true,
+        subject: true
+      }
+    });
+
+    const statsMap = new Map<string, any>();
+
+    for (const t of timetables) {
+      const start = parseInt(t.startTime.split(':')[0]);
+      const end = parseInt(t.endTime.split(':')[0]);
+      const hours = end - start;
+
+      const key = `${t.teacherId}-${t.classId}-${t.subjectId}`;
+      if (!statsMap.has(key)) {
+        statsMap.set(key, {
+          teacherName: `${t.teacher.user.firstName} ${t.teacher.user.lastName}`,
+          className: t.class.name,
+          subjectName: t.subject.name,
+          hoursPerWeek: 0
+        });
+      }
+
+      statsMap.get(key).hoursPerWeek += hours;
+    }
+
+    return Array.from(statsMap.values());
+  }
 }
