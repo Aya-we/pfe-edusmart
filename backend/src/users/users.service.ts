@@ -19,7 +19,12 @@ export class UsersService {
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { teacherClasses: { include: { class: true } } } },
+        teacher: { 
+          include: { 
+            teacherClasses: { include: { class: true } },
+            teacherSubjects: { include: { subject: true } }
+          } 
+        },
         parent: true,
       },
     });
@@ -27,7 +32,9 @@ export class UsersService {
     return users.map(user => {
       if (user.teacher) {
         (user.teacher as any).classes = (user.teacher as any).teacherClasses?.map((tc: any) => tc.class) || [];
+        (user.teacher as any).subjects = (user.teacher as any).teacherSubjects?.map((ts: any) => ts.subject) || [];
         delete (user.teacher as any).teacherClasses;
+        delete (user.teacher as any).teacherSubjects;
       }
       return user;
     });
@@ -43,21 +50,28 @@ export class UsersService {
             parent: { include: { user: true } },
           },
         },
-        teacher: { include: { teacherClasses: { include: { class: true } } } },
+        teacher: { 
+          include: { 
+            teacherClasses: { include: { class: true } },
+            teacherSubjects: { include: { subject: true } }
+          } 
+        },
         parent: { include: { students: { include: { user: true, class: true } } } },
       },
     });
     
     if (user && user.teacher) {
       (user.teacher as any).classes = (user.teacher as any).teacherClasses?.map((tc: any) => tc.class) || [];
+      (user.teacher as any).subjects = (user.teacher as any).teacherSubjects?.map((ts: any) => ts.subject) || [];
       delete (user.teacher as any).teacherClasses;
+      delete (user.teacher as any).teacherSubjects;
     }
     
     return user;
   }
 
   async update(id: string, data: any) {
-    const { classId, teacherClasses, parentId, ...userData } = data;
+    const { classId, teacherClasses, teacherSubjects, parentId, ...userData } = data;
 
     // 1. Update User basic info
     const user = await this.prisma.user.update({
@@ -86,22 +100,34 @@ export class UsersService {
       }
     }
 
-    // 3. Update Teacher Classes
-    if (user.role === 'TEACHER' && teacherClasses) {
+    // 3. Update Teacher Classes and Subjects
+    if (user.role === 'TEACHER') {
+      const teacherUpdate: any = {};
+      const teacherCreate: any = { userId: id };
+      
+      if (teacherClasses) {
+        teacherUpdate.teacherClasses = {
+          deleteMany: {},
+          create: teacherClasses.map((cid: string) => ({ classId: cid })),
+        };
+        teacherCreate.teacherClasses = {
+          create: teacherClasses.map((cid: string) => ({ classId: cid })),
+        };
+      }
+      if (teacherSubjects) {
+        teacherUpdate.teacherSubjects = {
+          deleteMany: {},
+          create: teacherSubjects.map((sid: string) => ({ subjectId: sid })),
+        };
+        teacherCreate.teacherSubjects = {
+          create: teacherSubjects.map((sid: string) => ({ subjectId: sid })),
+        };
+      }
+
       await this.prisma.teacher.upsert({
         where: { userId: id },
-        update: {
-          teacherClasses: {
-            deleteMany: {},
-            create: teacherClasses.map((cid: string) => ({ classId: cid })),
-          },
-        },
-        create: {
-          userId: id,
-          teacherClasses: {
-            create: teacherClasses.map((cid: string) => ({ classId: cid })),
-          },
-        }
+        update: teacherUpdate,
+        create: teacherCreate
       });
     }
     // 4. Update Parent

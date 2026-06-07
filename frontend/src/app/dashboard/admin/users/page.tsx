@@ -23,6 +23,7 @@ export default function UsersManagementPage() {
   const { user: currentUser } = useAuth();
   const [users,   setUsers]   = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   const [parents, setParents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal,      setShowModal]      = useState(false);
@@ -35,23 +36,28 @@ export default function UsersManagementPage() {
     classId: "",
     parentId: "",               // 🆕 parent d l'étudiant
     teacherClasses: [] as string[],
+    teacherSubjects: [] as string[],
   });
 
   /* ─── Fetch all data ─── */
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetch classes
+      // Fetch classes and subjects
       let cData: any[] = [];
       try {
-        const cRes = await axios.get(`${API}/classes?schoolId=${currentUser?.schoolId}`);
+        const [cRes, sRes] = await Promise.all([
+          axios.get(`${API}/classes?schoolId=${currentUser?.schoolId}`),
+          axios.get(`${API}/subjects?schoolId=${currentUser?.schoolId}`)
+        ]);
         cData = cRes.data;
         setClasses(cData);
+        setSubjects(sRes.data);
         if (cData.length && !formData.classId) {
           setFormData(p => ({ ...p, classId: cData[0].id }));
         }
       } catch (err) {
-        console.error("Failed to fetch classes:", err);
+        console.error("Failed to fetch classes or subjects:", err);
       }
 
       // Fetch users
@@ -84,6 +90,7 @@ export default function UsersManagementPage() {
       classId:   user.student?.classId || (classes[0]?.id ?? ""),
       parentId:  user.student?.parentId || "",      // 🆕
       teacherClasses: user.teacher?.classes?.map((c: any) => c.id) || [],
+      teacherSubjects: user.teacher?.subjects?.map((s: any) => s.id) || [],
     });
     setShowModal(true);
   };
@@ -95,7 +102,7 @@ export default function UsersManagementPage() {
     setFormData({
       firstName: "", lastName: "", email: "", password: "",
       role: "STUDENT", classId: classes[0]?.id ?? "",
-      parentId: "", teacherClasses: [],
+      parentId: "", teacherClasses: [], teacherSubjects: []
     });
   };
 
@@ -105,6 +112,15 @@ export default function UsersManagementPage() {
       teacherClasses: p.teacherClasses.includes(cid)
         ? p.teacherClasses.filter(x => x !== cid)
         : [...p.teacherClasses, cid],
+    }));
+  };
+
+  const toggleTeacherSubject = (sid: string) => {
+    setFormData(p => ({
+      ...p,
+      teacherSubjects: p.teacherSubjects.includes(sid)
+        ? p.teacherSubjects.filter(x => x !== sid)
+        : [...p.teacherSubjects, sid],
     }));
   };
 
@@ -121,6 +137,7 @@ export default function UsersManagementPage() {
           classId:        formData.classId,
           parentId:       formData.parentId || null,    // 🆕
           teacherClasses: formData.teacherClasses,
+          teacherSubjects: formData.teacherSubjects,
         });
         alert("Compte modifié avec succès !");
       } else {
@@ -178,7 +195,7 @@ export default function UsersManagementPage() {
               <TableHead className="py-4 pl-6 font-bold text-foreground">Nom & Prénom</TableHead>
               <TableHead className="font-bold text-foreground">Email</TableHead>
               <TableHead className="font-bold text-foreground">Rôle</TableHead>
-              <TableHead className="font-bold text-foreground">Classe / Parent</TableHead>
+              <TableHead className="font-bold text-foreground">Classe / Parent / Matières</TableHead>
               <TableHead className="text-right pr-6 font-bold text-foreground">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -203,7 +220,12 @@ export default function UsersManagementPage() {
                       )}
                     </div>
                   )}
-                  {u.role === "TEACHER" && (u.teacher?.classes?.map((c: any) => c.name)?.join(", ") || "—")}
+                  {u.role === "TEACHER" && (
+                    <div className="flex flex-col gap-1">
+                      <span><span className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mr-1">Classes:</span> {u.teacher?.classes?.map((c: any) => c.name)?.join(", ") || "—"}</span>
+                      <span><span className="font-semibold text-xs uppercase tracking-widest text-muted-foreground mr-1">Matières:</span> {u.teacher?.subjects?.map((s: any) => s.name)?.join(", ") || "—"}</span>
+                    </div>
+                  )}
                   {(u.role === "ADMIN" || u.role === "PARENT") && "—"}
                 </TableCell>
                 <TableCell className="text-right pr-6">
@@ -309,20 +331,38 @@ export default function UsersManagementPage() {
 
               {/* ── Champs PROFESSEUR ── */}
               {formData.role === "TEACHER" && (
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Classes assignées</label>
-                  <div className="grid grid-cols-2 gap-2 p-4 rounded-xl border border-border bg-muted/5 max-h-48 overflow-y-auto">
-                    {classes.length === 0 && <p className="col-span-2 text-xs text-muted-foreground text-center py-2">Aucune classe disponible</p>}
-                    {classes.map(c => (
-                      <label key={c.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted transition-all">
-                        <input type="checkbox" checked={formData.teacherClasses.includes(c.id)}
-                          onChange={() => toggleTeacherClass(c.id)}
-                          className="accent-foreground w-4 h-4 rounded" />
-                        <span className="text-sm font-medium">{c.name}</span>
-                      </label>
-                    ))}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Classes assignées</label>
+                    <div className="grid grid-cols-2 gap-2 p-4 rounded-xl border border-border bg-muted/5 max-h-48 overflow-y-auto">
+                      {classes.length === 0 && <p className="col-span-2 text-xs text-muted-foreground text-center py-2">Aucune classe disponible</p>}
+                      {classes.map(c => (
+                        <label key={c.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted transition-all">
+                          <input type="checkbox" checked={formData.teacherClasses.includes(c.id)}
+                            onChange={() => toggleTeacherClass(c.id)}
+                            className="accent-foreground w-4 h-4 rounded" />
+                          <span className="text-sm font-medium">{c.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{formData.teacherClasses.length} classe(s) sélectionnée(s)</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">{formData.teacherClasses.length} classe(s) sélectionnée(s)</p>
+                  
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Matières assignées</label>
+                    <div className="grid grid-cols-2 gap-2 p-4 rounded-xl border border-border bg-muted/5 max-h-48 overflow-y-auto">
+                      {subjects.length === 0 && <p className="col-span-2 text-xs text-muted-foreground text-center py-2">Aucune matière disponible</p>}
+                      {subjects.map(s => (
+                        <label key={s.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-muted transition-all">
+                          <input type="checkbox" checked={formData.teacherSubjects.includes(s.id)}
+                            onChange={() => toggleTeacherSubject(s.id)}
+                            className="accent-foreground w-4 h-4 rounded" />
+                          <span className="text-sm font-medium">{s.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{formData.teacherSubjects.length} matière(s) sélectionnée(s)</p>
+                  </div>
                 </div>
               )}
 
