@@ -262,7 +262,7 @@ export default function GradebookPage() {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50 font-bold"
           >
             <CheckCircle2 className="w-5 h-5 text-green-400" />
-            Notes enregistrées dans MySQL !
+            Notes enregistrées avec succès !
           </motion.div>
         )}
       </AnimatePresence>

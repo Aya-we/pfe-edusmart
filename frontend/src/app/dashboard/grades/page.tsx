@@ -85,7 +85,7 @@ export default function StudentGradesPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border pb-8">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Mes Résultats</h1>
-          <p className="text-muted-foreground mt-2 text-lg">Moyennes réelles calculées depuis MySQL.</p>
+          <p className="text-muted-foreground mt-2 text-lg">Moyennes réelles calculées à partir des notes.</p>
         </div>
       </div>
 
