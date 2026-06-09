@@ -111,7 +111,7 @@ export default function StudentAttendancePage() {
                     {new Date(absence.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center gap-10.5 px-20.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
                       absence.status === 'PRESENT'
                         ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900'
                         : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900'
@@ -130,24 +130,20 @@ export default function StudentAttendancePage() {
                         ) : absence.justification ? (
                           <span className="text-orange-500 text-[10px] font-black uppercase italic">En cours de validation...</span>
                         ) : (
-                          <div className="relative overflow-hidden inline-block">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="h-7 text-[9px] font-bold uppercase tracking-widest border-foreground hover:bg-foreground hover:text-background transition-all"
-                            >
+                          <label className="relative overflow-hidden inline-block cursor-pointer">
+                            <div className="h-7 px-3 inline-flex items-center justify-center rounded-md border border-foreground text-[9px] font-bold uppercase tracking-widest hover:bg-foreground hover:text-background transition-all">
                               Justifier (Upload)
-                            </Button>
+                            </div>
                             <input 
                               type="file" 
-                              className="absolute inset-0 opacity-0 cursor-pointer"
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                               onChange={(e) => {
                                 if (e.target.files?.[0]) {
                                   handleJustify(absence.id, e.target.files[0]);
                                 }
                               }}
                             />
-                          </div>
+                          </label>
                         )}
                       </div>
                     )}
